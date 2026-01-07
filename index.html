@@ -3,186 +3,163 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>Cat Story Lovers</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
         
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: Arial, sans-serif;
             background: linear-gradient(135deg, #fce7f3 0%, #f3e8ff 50%, #dbeafe 100%);
             min-height: 100vh;
-            transition: background-color 0.3s;
-        }
-        
-        body.dark-mode {
-            background: #1a1a1a;
-            color: #e5e5e5;
-        }
-        
-        .dark-mode .card {
-            background-color: #2a2a2a !important;
-            color: #e5e5e5 !important;
-        }
-        
-        .dark-mode .input {
-            background-color: #333 !important;
-            color: #e5e5e5 !important;
-            border-color: #505050 !important;
-        }
-        
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 1rem;
+            overflow-x: hidden;
         }
         
         .header {
             background: linear-gradient(135deg, #ec4899, #a855f7);
-            padding: 1.5rem;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            padding: 20px;
+            color: white;
             position: sticky;
             top: 0;
             z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
         }
         
-        .header.theme-blue { background: linear-gradient(135deg, #3b82f6, #06b6d4); }
-        .header.theme-green { background: linear-gradient(135deg, #10b981, #14b8a6); }
-        .header.theme-orange { background: linear-gradient(135deg, #f97316, #f59e0b); }
-        .header.theme-purple { background: linear-gradient(135deg, #8b5cf6, #a855f7); }
-        
-        .header-content {
+        .header-flex {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
         }
         
         .title {
-            font-size: 1.5rem;
+            font-size: 24px;
             font-weight: bold;
-            color: white;
         }
         
         .subtitle {
-            font-size: 0.875rem;
-            color: rgba(255,255,255,0.9);
-            margin-top: 0.25rem;
+            font-size: 14px;
+            opacity: 0.9;
+            margin-top: 5px;
         }
         
         .btn-group {
             display: flex;
-            gap: 0.75rem;
+            gap: 10px;
         }
         
         .btn-icon {
-            width: 3rem;
-            height: 3rem;
+            width: 50px;
+            height: 50px;
             border-radius: 50%;
-            background: rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.3);
             border: none;
             color: white;
-            font-size: 1.5rem;
+            font-size: 24px;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.3s;
         }
         
-        .btn-icon:active {
-            transform: scale(0.95);
-        }
-        
-        .btn-icon.primary {
+        .btn-add {
+            width: 55px;
+            height: 55px;
             background: white;
             color: #ec4899;
-            width: 3.5rem;
-            height: 3.5rem;
-            font-size: 2rem;
+            font-size: 32px;
+            font-weight: bold;
+        }
+        
+        .content {
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
         }
         
         .card {
             background: white;
-            border-radius: 1rem;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
             overflow: hidden;
-            margin-bottom: 1.5rem;
+            cursor: pointer;
         }
         
-        .card-image {
+        .card-img {
             width: 100%;
-            height: 14rem;
+            height: 200px;
             object-fit: cover;
+            display: block;
         }
         
         .card-placeholder {
             width: 100%;
-            height: 14rem;
+            height: 200px;
             background: linear-gradient(135deg, #fbb6ce, #c084fc);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 5rem;
+            font-size: 80px;
         }
         
         .card-body {
-            padding: 1.25rem;
+            padding: 20px;
         }
         
         .card-title {
-            font-size: 1.5rem;
+            font-size: 24px;
             font-weight: bold;
             color: #1f2937;
-            margin-bottom: 0.5rem;
+            margin-bottom: 5px;
         }
         
         .card-text {
             color: #6b7280;
-            margin-bottom: 0.5rem;
+            margin-bottom: 5px;
+        }
+        
+        .empty {
+            text-align: center;
+            padding: 80px 20px;
+        }
+        
+        .empty-icon {
+            font-size: 100px;
+            margin-bottom: 20px;
         }
         
         .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 1.5rem;
-            padding: 1.5rem 0;
-        }
-        
-        .empty-state {
-            text-align: center;
-            padding: 5rem 0;
-        }
-        
-        .empty-icon {
-            font-size: 6rem;
-            margin-bottom: 1.5rem;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
         }
         
         .input {
             width: 100%;
-            padding: 1rem;
+            padding: 15px;
             border: 2px solid #d1d5db;
-            border-radius: 0.75rem;
-            font-size: 1rem;
-            margin-bottom: 1rem;
+            border-radius: 10px;
+            font-size: 16px;
+            margin-bottom: 15px;
+            background: white;
         }
         
         .btn {
             width: 100%;
-            padding: 1rem;
+            padding: 15px;
             border: none;
-            border-radius: 0.75rem;
-            font-size: 1rem;
+            border-radius: 10px;
+            font-size: 16px;
             font-weight: bold;
             cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .btn:active {
-            transform: scale(0.98);
+            margin-bottom: 10px;
         }
         
         .btn-primary {
@@ -210,21 +187,39 @@
             color: white;
         }
         
-        .photo-gallery {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-            gap: 0.5rem;
-            margin: 1rem 0;
+        .flex {
+            display: flex;
+            gap: 10px;
         }
         
-        .photo-item {
+        .flex-1 {
+            flex: 1;
+        }
+        
+        .back-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 32px;
+            cursor: pointer;
+            padding: 0 10px;
+        }
+        
+        .photo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 10px;
+            margin: 15px 0;
+        }
+        
+        .photo-box {
             position: relative;
             aspect-ratio: 1;
-            border-radius: 0.5rem;
+            border-radius: 10px;
             overflow: hidden;
         }
         
-        .photo-item img {
+        .photo-box img {
             width: 100%;
             height: 100%;
             object-fit: cover;
@@ -232,131 +227,99 @@
         
         .photo-remove {
             position: absolute;
-            top: 0.25rem;
-            right: 0.25rem;
+            top: 5px;
+            right: 5px;
             background: #ef4444;
             color: white;
             border: none;
             border-radius: 50%;
-            width: 1.5rem;
-            height: 1.5rem;
-            font-size: 1rem;
+            width: 25px;
+            height: 25px;
+            font-size: 16px;
             cursor: pointer;
         }
         
-        .file-label {
+        .file-upload {
             display: block;
-            padding: 2rem;
+            padding: 40px;
             border: 2px dashed #d1d5db;
-            border-radius: 0.75rem;
+            border-radius: 10px;
             text-align: center;
             cursor: pointer;
-            margin: 1rem 0;
+            margin: 15px 0;
+            background: white;
         }
         
-        .file-label:active {
-            background: #f3f4f6;
+        .upload-icon {
+            font-size: 60px;
+            margin-bottom: 10px;
         }
         
         .modal {
             display: none;
             position: fixed;
-            z-index: 1000;
-            left: 0;
             top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0,0,0,0.9);
+            background: rgba(0,0,0,0.9);
+            z-index: 2000;
             align-items: center;
             justify-content: center;
         }
         
-        .modal.active {
+        .modal.show {
             display: flex;
         }
         
         .modal img {
             max-width: 90%;
             max-height: 90%;
-            border-radius: 0.5rem;
-        }
-        
-        .back-btn {
-            background: none;
-            border: none;
-            color: white;
-            font-size: 2rem;
-            cursor: pointer;
-            padding: 0.5rem;
-            margin-right: 1rem;
+            border-radius: 10px;
         }
         
         .section-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 1rem;
+            margin-bottom: 15px;
         }
         
         .section-title {
-            font-size: 1.5rem;
+            font-size: 20px;
             font-weight: bold;
         }
         
-        .item-box {
+        .item-card {
             border: 2px solid #e5e7eb;
-            border-radius: 0.75rem;
-            padding: 1rem;
-            margin-bottom: 1rem;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
             position: relative;
         }
         
-        .delete-btn {
+        .del-btn {
             position: absolute;
-            top: 0.75rem;
-            right: 0.75rem;
+            top: 10px;
+            right: 10px;
             background: none;
             border: none;
             color: #ef4444;
-            font-size: 1.25rem;
+            font-size: 20px;
             cursor: pointer;
         }
         
-        .theme-selector {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 0.75rem;
-            margin: 1rem 0;
-        }
-        
-        .theme-box {
-            aspect-ratio: 1;
-            border-radius: 0.75rem;
-            cursor: pointer;
-            border: 3px solid transparent;
-        }
-        
-        .theme-box.active {
-            border-color: #ec4899;
-            box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.3);
-        }
-        
-        .theme-pink { background: linear-gradient(135deg, #ec4899, #a855f7); }
-        .theme-blue { background: linear-gradient(135deg, #3b82f6, #06b6d4); }
-        .theme-green { background: linear-gradient(135deg, #10b981, #14b8a6); }
-        .theme-orange { background: linear-gradient(135deg, #f97316, #f59e0b); }
-        .theme-purple { background: linear-gradient(135deg, #8b5cf6, #a855f7); }
-        
-        .lang-selector {
+        .lang-btns {
             display: flex;
-            gap: 0.75rem;
+            gap: 10px;
+            margin: 15px 0;
         }
         
         .lang-btn {
             flex: 1;
-            padding: 0.75rem;
+            padding: 15px;
             border: 2px solid #e5e7eb;
-            border-radius: 0.75rem;
+            border-radius: 10px;
             background: white;
             cursor: pointer;
             font-weight: bold;
@@ -368,103 +331,91 @@
             border-color: #3b82f6;
         }
         
-        .calendar {
+        .theme-grid {
             display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 0.25rem;
-            margin: 1rem 0;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            margin: 15px 0;
         }
         
-        .calendar-day {
+        .theme-box {
             aspect-ratio: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 0.5rem;
-            font-size: 0.9rem;
-            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            cursor: pointer;
+            border: 3px solid transparent;
         }
         
-        .calendar-day.has-event {
-            background: linear-gradient(135deg, #ec4899, #a855f7);
-            color: white;
-            font-weight: bold;
+        .theme-box.active {
+            border-color: #1f2937;
         }
         
-        .calendar-day.today {
-            border: 2px solid #ec4899;
-        }
+        .theme-1 { background: linear-gradient(135deg, #ec4899, #a855f7); }
+        .theme-2 { background: linear-gradient(135deg, #3b82f6, #06b6d4); }
+        .theme-3 { background: linear-gradient(135deg, #10b981, #14b8a6); }
+        .theme-4 { background: linear-gradient(135deg, #f97316, #f59e0b); }
+        .theme-5 { background: linear-gradient(135deg, #8b5cf6, #a855f7); }
         
-        .chart-container {
-            width: 100%;
-            height: 250px;
-            margin: 1rem 0;
-            position: relative;
-        }
-        
-        .fade-in {
-            animation: fadeIn 0.3s;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        
-        .content {
-            padding: 1.5rem 1rem;
-        }
-        
-        .flex-row {
-            display: flex;
-            gap: 0.75rem;
-        }
-        
-        .flex-1 {
-            flex: 1;
-        }
-        
-        .mb-1 { margin-bottom: 0.5rem; }
-        .mb-2 { margin-bottom: 1rem; }
-        .mt-2 { margin-top: 1rem; }
-        .p-2 { padding: 1rem; }
-        
-        .text-sm { font-size: 0.875rem; }
+        .mb-1 { margin-bottom: 10px; }
+        .mt-1 { margin-top: 10px; }
+        .p-1 { padding: 15px; }
         .text-gray { color: #6b7280; }
-        .font-bold { font-weight: bold; }
+        .text-sm { font-size: 14px; }
+        .bold { font-weight: bold; }
+        
+        input[type="file"] {
+            display: none;
+        }
     </style>
 </head>
 <body>
-    <div id="app"></div>
+    <div id="app">
+        <div class="header">
+            <div class="header-flex">
+                <div class="title">Loading...</div>
+            </div>
+        </div>
+        <div class="content">
+            <div class="empty">
+                <div class="empty-icon">⏳</div>
+                <h2>Memuat aplikasi...</h2>
+            </div>
+        </div>
+    </div>
     
-    <div id="imageModal" class="modal" onclick="closeModal()">
-        <img id="modalImage" src="" alt="Full size">
+    <div id="modal" class="modal" onclick="closeModal()">
+        <img id="modalImg" src="" alt="">
     </div>
 
     <script>
-        // Initialize
-        console.log('App starting...');
+        // Global variables
+        var app = {
+            lang: 'id',
+            page: 'home',
+            cats: [],
+            vaccines: [],
+            medicines: [],
+            selected: null,
+            form: {},
+            theme: 1
+        };
         
-        const translations = {
+        var text = {
             id: {
-                myTitle: 'Cat Story Lovers',
+                title: 'Cat Story Lovers',
                 total: 'Total',
-                noCats: 'Belum ada kucing',
-                clickAdd: 'Klik tombol + untuk menambahkan',
+                empty: 'Belum ada kucing',
+                clickAdd: 'Klik + untuk menambah',
                 add: 'Tambah',
                 edit: 'Edit',
                 cat: 'Kucing',
                 detail: 'Detail',
-                photos: 'Foto',
-                selectPhotos: 'Pilih Foto dari Galeri',
                 name: 'Nama',
                 breed: 'Jenis',
                 gender: 'Kelamin',
-                choose: 'Pilih',
                 male: 'Jantan',
                 female: 'Betina',
                 color: 'Warna',
-                birthDate: 'Tanggal Lahir',
+                birth: 'Tanggal Lahir',
                 weight: 'Berat',
                 price: 'Harga',
                 notes: 'Catatan',
@@ -476,30 +427,27 @@
                 noData: 'Belum ada data',
                 settings: 'Pengaturan',
                 language: 'Bahasa',
-                darkMode: 'Mode Gelap',
                 theme: 'Tema',
-                backup: 'Backup Data',
-                kg: 'kg'
+                photos: 'Foto',
+                uploadPhoto: 'Upload Foto',
+                max8: 'Max 8 foto'
             },
             en: {
-                myTitle: 'Cat Story Lovers',
+                title: 'Cat Story Lovers',
                 total: 'Total',
-                noCats: 'No cats yet',
+                empty: 'No cats yet',
                 clickAdd: 'Click + to add',
                 add: 'Add',
                 edit: 'Edit',
                 cat: 'Cat',
                 detail: 'Detail',
-                photos: 'Photos',
-                selectPhotos: 'Select Photos',
                 name: 'Name',
                 breed: 'Breed',
                 gender: 'Gender',
-                choose: 'Choose',
                 male: 'Male',
                 female: 'Female',
                 color: 'Color',
-                birthDate: 'Birth Date',
+                birth: 'Birth Date',
                 weight: 'Weight',
                 price: 'Price',
                 notes: 'Notes',
@@ -511,576 +459,321 @@
                 noData: 'No data',
                 settings: 'Settings',
                 language: 'Language',
-                darkMode: 'Dark Mode',
                 theme: 'Theme',
-                backup: 'Backup',
-                kg: 'kg'
+                photos: 'Photos',
+                uploadPhoto: 'Upload Photo',
+                max8: 'Max 8 photos'
             }
         };
-
-        let lang = 'id';
-        let page = 'home';
-        let cats = [];
-        let vaccines = [];
-        let medicines = [];
-        let selectedCat = null;
-        let formData = {};
-        let darkMode = false;
-        let currentTheme = 'pink';
-
+        
         function t(key) {
-            return translations[lang][key] || key;
+            return text[app.lang][key] || key;
         }
-
+        
         function loadData() {
             try {
-                const savedCats = localStorage.getItem('cats');
-                const savedVaccines = localStorage.getItem('vaccines');
-                const savedMedicines = localStorage.getItem('medicines');
-                const savedLang = localStorage.getItem('language');
-                const savedDarkMode = localStorage.getItem('darkMode');
-                const savedTheme = localStorage.getItem('theme');
-                
-                if (savedCats) cats = JSON.parse(savedCats);
-                if (savedVaccines) vaccines = JSON.parse(savedVaccines);
-                if (savedMedicines) medicines = JSON.parse(savedMedicines);
-                if (savedLang) lang = savedLang;
-                if (savedDarkMode) darkMode = savedDarkMode === 'true';
-                if (savedTheme) currentTheme = savedTheme;
-                
-                applyDarkMode();
+                var saved = localStorage.getItem('catAppData');
+                if (saved) {
+                    var data = JSON.parse(saved);
+                    app.cats = data.cats || [];
+                    app.vaccines = data.vaccines || [];
+                    app.medicines = data.medicines || [];
+                    app.lang = data.lang || 'id';
+                    app.theme = data.theme || 1;
+                }
             } catch (e) {
-                console.error('Error loading data:', e);
+                console.log('Load error:', e);
             }
         }
-
+        
         function saveData() {
             try {
-                localStorage.setItem('cats', JSON.stringify(cats));
-                localStorage.setItem('vaccines', JSON.stringify(vaccines));
-                localStorage.setItem('medicines', JSON.stringify(medicines));
-                localStorage.setItem('language', lang);
-                localStorage.setItem('darkMode', darkMode);
-                localStorage.setItem('theme', currentTheme);
-            } catch (e) {
-                console.error('Error saving data:', e);
-            }
-        }
-
-        function applyDarkMode() {
-            if (darkMode) {
-                document.body.classList.add('dark-mode');
-            } else {
-                document.body.classList.remove('dark-mode');
-            }
-        }
-
-        function toggleDarkMode() {
-            darkMode = !darkMode;
-            applyDarkMode();
-            saveData();
-            render();
-        }
-
-        function changeTheme(theme) {
-            currentTheme = theme;
-            saveData();
-            render();
-        }
-
-        function changeLang(newLang) {
-            lang = newLang;
-            saveData();
-            render();
-        }
-
-        function calculateAge(birthDate) {
-            if (!birthDate) return t('noData');
-            const today = new Date();
-            const birth = new Date(birthDate);
-            const years = Math.floor((today - birth) / (365.25 * 24 * 60 * 60 * 1000));
-            const months = Math.floor(((today - birth) % (365.25 * 24 * 60 * 60 * 1000)) / (30.44 * 24 * 60 * 60 * 1000));
-            return `${years} ${lang === 'id' ? 'tahun' : 'years'} ${months} ${lang === 'id' ? 'bulan' : 'months'}`;
-        }
-
-        function formatDate(dateString) {
-            if (!dateString) return t('noData');
-            const date = new Date(dateString);
-            const monthsId = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agt', 'Sep', 'Okt', 'Nov', 'Des'];
-            const monthsEn = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-            const months = lang === 'id' ? monthsId : monthsEn;
-            return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
-        }
-
-        function handleMultipleImageUpload(event) {
-            const files = event.target.files;
-            if (!formData.photos) formData.photos = [];
-            
-            Array.from(files).forEach(file => {
-                if (formData.photos.length >= 8) {
-                    alert(lang === 'id' ? 'Maksimal 8 foto!' : 'Maximum 8 photos!');
-                    return;
-                }
-                
-                if (file.size > 5000000) {
-                    alert(lang === 'id' ? 'File terlalu besar! Max 5MB' : 'File too large! Max 5MB');
-                    return;
-                }
-                
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    formData.photos.push(e.target.result);
-                    render();
+                var data = {
+                    cats: app.cats,
+                    vaccines: app.vaccines,
+                    medicines: app.medicines,
+                    lang: app.lang,
+                    theme: app.theme
                 };
-                reader.readAsDataURL(file);
-            });
-        }
-
-        function removePhoto(index) {
-            formData.photos.splice(index, 1);
-            render();
-        }
-
-        function openModal(photoUrl) {
-            document.getElementById('modalImage').src = photoUrl;
-            document.getElementById('imageModal').classList.add('active');
-        }
-
-        function closeModal() {
-            document.getElementById('imageModal').classList.remove('active');
-        }
-
-        function saveCat() {
-            if (!formData.name || !formData.breed) {
-                alert(lang === 'id' ? 'Nama dan jenis wajib diisi!' : 'Name and breed required!');
-                return;
-            }
-            if (!formData.photos) formData.photos = [];
-            if (formData.id) {
-                cats = cats.map(c => c.id === formData.id ? formData : c);
-            } else {
-                cats.push({ ...formData, id: Date.now() });
-            }
-            saveData();
-            formData = {};
-            page = 'home';
-            render();
-        }
-
-        function deleteCat(id) {
-            if (confirm(lang === 'id' ? 'Hapus kucing ini?' : 'Delete this cat?')) {
-                cats = cats.filter(c => c.id !== id);
-                vaccines = vaccines.filter(v => v.catId !== id);
-                medicines = medicines.filter(m => m.catId !== id);
-                saveData();
-                page = 'home';
-                render();
+                localStorage.setItem('catAppData', JSON.stringify(data));
+            } catch (e) {
+                console.log('Save error:', e);
             }
         }
-
-        function saveVaccine() {
-            if (!formData.name || !formData.date) {
-                alert(lang === 'id' ? 'Nama dan tanggal wajib diisi!' : 'Name and date required!');
-                return;
-            }
-            vaccines.push({ ...formData, id: Date.now(), catId: selectedCat.id });
-            saveData();
-            formData = {};
-            page = 'detail';
-            render();
+        
+        function calcAge(birth) {
+            if (!birth) return t('noData');
+            var today = new Date();
+            var birthDate = new Date(birth);
+            var years = Math.floor((today - birthDate) / (365.25 * 24 * 60 * 60 * 1000));
+            var months = Math.floor(((today - birthDate) % (365.25 * 24 * 60 * 60 * 1000)) / (30.44 * 24 * 60 * 60 * 1000));
+            return years + (app.lang === 'id' ? ' tahun ' : ' years ') + months + (app.lang === 'id' ? ' bulan' : ' months');
         }
-
-        function deleteVaccine(id) {
-            if (confirm(lang === 'id' ? 'Hapus vaksin?' : 'Delete vaccine?')) {
-                vaccines = vaccines.filter(v => v.id !== id);
-                saveData();
-                render();
-            }
+        
+        function fmtDate(d) {
+            if (!d) return t('noData');
+            var date = new Date(d);
+            var months = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agt','Sep','Okt','Nov','Des'];
+            return date.getDate() + ' ' + months[date.getMonth()] + ' ' + date.getFullYear();
         }
-
-        function saveMedicine() {
-            if (!formData.name || !formData.type) {
-                alert(lang === 'id' ? 'Nama dan tipe wajib diisi!' : 'Name and type required!');
-                return;
-            }
-            medicines.push({ ...formData, id: Date.now(), catId: selectedCat.id });
-            saveData();
-            formData = {};
-            page = 'detail';
-            render();
-        }
-
-        function deleteMedicine(id) {
-            if (confirm(lang === 'id' ? 'Hapus obat?' : 'Delete medicine?')) {
-                medicines = medicines.filter(m => m.id !== id);
-                saveData();
-                render();
-            }
-        }
-
-        function exportData() {
-            const data = { cats, vaccines, medicines, exportDate: new Date().toISOString() };
-            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'cat-story-lovers-backup.json';
-            a.click();
-            URL.revokeObjectURL(url);
-        }
-
-        function render() {
-            const app = document.getElementById('app');
+        
+        function uploadPhotos(e) {
+            var files = e.target.files;
+            if (!app.form.photos) app.form.photos = [];
             
-            if (page === 'home') {
-                app.innerHTML = `
-                    <div class="fade-in">
-                        <div class="header theme-${currentTheme}">
-                            <div class="header-content container">
-                                <div>
-                                    <div class="title">🐱 ${t('myTitle')}</div>
-                                    <div class="subtitle">${t('total')}: ${cats.length}</div>
-                                </div>
-                                <div class="btn-group">
-                                    <button class="btn-icon" onclick="toggleDarkMode()">${darkMode ? '☀️' : '🌙'}</button>
-                                    <button class="btn-icon" onclick="page='settings'; render()">⚙️</button>
-                                    <button class="btn-icon primary" onclick="formData={}; formData.photos=[]; page='add'; render()">+</button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="content container">
-                            ${cats.length === 0 ? `
-                                <div class="empty-state">
-                                    <div class="empty-icon">😿</div>
-                                    <h2>${t('noCats')}</h2>
-                                    <p class="text-gray">${t('clickAdd')}</p>
-                                </div>
-                            ` : `
-                                <div class="grid">
-                                    ${cats.map(cat => `
-                                        <div class="card" onclick="selectedCat=${JSON.stringify(cat).replace(/"/g, '&quot;')}; page='detail'; render();">
-                                            ${cat.photos && cat.photos.length > 0 ? 
-                                                `<img src="${cat.photos[0]}" class="card-image" alt="${cat.name}">` :
-                                                `<div class="card-placeholder">🐱</div>`
-                                            }
-                                            <div class="card-body">
-                                                <h3 class="card-title">${cat.name}</h3>
-                                                <p class="card-text">${cat.breed}</p>
-                                                <p class="text-sm text-gray">⏰ ${calculateAge(cat.birthDate)}</p>
-                                            </div>
-                                        </div>
-                                    `).join('')}
-                                </div>
-                            `}
-                        </div>
-                    </div>
-                `;
-            }
-            
-            else if (page === 'add') {
-                app.innerHTML = `
-                    <div class="fade-in">
-                        <div class="header theme-${currentTheme}">
-                            <div class="header-content container">
-                                <button class="back-btn" onclick="page='home'; render()">←</button>
-                                <div class="title">${formData.id ? t('edit') : t('add')} ${t('cat')}</div>
-                            </div>
-                        </div>
-                        <div class="content container">
-                            <div class="card">
-                                <div class="card-body">
-                                    ${formData.photos && formData.photos.length > 0 ? `
-                                        <div class="photo-gallery">
-                                            ${formData.photos.map((photo, index) => `
-                                                <div class="photo-item">
-                                                    <img src="${photo}" alt="Photo ${index + 1}" onclick="openModal('${photo}')">
-                                                    <button class="photo-remove" onclick="event.stopPropagation(); removePhoto(${index})">×</button>
-                                                </div>
-                                            `).join('')}
-                                        </div>
-                                    ` : ''}
-                                    
-                                    ${!formData.photos || formData.photos.length < 8 ? `
-                                        <input type="file" id="photoFiles" accept="image/*" multiple onchange="handleMultipleImageUpload(event)" style="display:none">
-                                        <label for="photoFiles" class="file-label">
-                                            <div style="font-size: 3rem">📸</div>
-                                            <div class="font-bold">${t('selectPhotos')}</div>
-                                            <div class="text-sm text-gray">Max 8 photos, 5MB each</div>
-                                        </label>
-                                    ` : ''}
-                                    
-                                    <input type="text" id="name" class="input" placeholder="${t('name')} *" value="${formData.name || ''}">
-                                    <input type="text" id="breed" class="input" placeholder="${t('breed')} *" value="${formData.breed || ''}">
-                                    
-                                    <select id="gender" class="input">
-                                        <option value="">${t('gender')}</option>
-                                        <option value="${t('male')}" ${formData.gender === t('male') ? 'selected' : ''}>${t('male')}</option>
-                                        <option value="${t('female')}" ${formData.gender === t('female') ? 'selected' : ''}>${t('female')}</option>
-                                    </select>
-                                    
-                                    <input type="text" id="color" class="input" placeholder="${t('color')}" value="${formData.color || ''}">
-                                    <input type="date" id="birthDate" class="input" value="${formData.birthDate || ''}">
-                                    ${formData.birthDate ? `<p class="text-gray mb-2">⏰ ${calculateAge(formData.birthDate)}</p>` : ''}
-                                    
-                                    <input type="number" step="0.1" id="weight" class="input" placeholder="${t('weight')} (${t('kg')})" value="${formData.weight || ''}">
-                                    <input type="number" id="price" class="input" placeholder="${t('price')}" value="${formData.price || ''}">
-                                    <textarea id="notes" class="input" rows="4" placeholder="${t('notes')}">${formData.notes || ''}</textarea>
-                                    
-                                    <div class="flex-row">
-                                        <button class="btn btn-primary flex-1" onclick="
-                                            formData.name = document.getElementById('name').value;
-                                            formData.breed = document.getElementById('breed').value;
-                                            formData.gender = document.getElementById('gender').value;
-                                            formData.color = document.getElementById('color').value;
-                                            formData.birthDate = document.getElementById('birthDate').value;
-                                            formData.weight = document.getElementById('weight').value;
-                                            formData.price = document.getElementById('price').value;
-                                            formData.notes = document.getElementById('notes').value;
-                                            saveCat();
-                                        ">💾 ${t('save')}</button>
-                                        <button class="btn btn-secondary flex-1" onclick="page='home'; render()">❌ ${t('cancel')}</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }
-            
-            else if (page === 'detail') {
-                const catVaccines = vaccines.filter(v => v.catId === selectedCat.id);
-                const catMedicines = medicines.filter(m => m.catId === selectedCat.id);
+            for (var i = 0; i < files.length; i++) {
+                if (app.form.photos.length >= 8) {
+                    alert(t('max8'));
+                    break;
+                }
                 
-                app.innerHTML = `
-                    <div class="fade-in">
-                        <div class="header theme-${currentTheme}">
-                            <div class="header-content container">
-                                <button class="back-btn" onclick="page='home'; render()">←</button>
-                                <div class="title">${t('detail')}</div>
-                            </div>
-                        </div>
-                        <div class="content container">
-                            <div class="card">
-                                ${selectedCat.photos && selectedCat.photos.length > 0 ? `
-                                    <img src="${selectedCat.photos[0]}" class="card-image" onclick="openModal('${selectedCat.photos[0]}')" alt="${selectedCat.name}">
-                                    ${selectedCat.photos.length > 1 ? `
-                                        <div class="photo-gallery p-2">
-                                            ${selectedCat.photos.slice(1).map(photo => `
-                                                <div class="photo-item">
-                                                    <img src="${photo}" onclick="openModal('${photo}')" alt="Photo">
-                                                </div>
-                                            `).join('')}
-                                        </div>
-                                    ` : ''}
-                                ` : `
-                                    <div class="card-placeholder">🐱</div>
-                                `}
-                                
-                                <div class="card-body">
-                                    <h2 class="card-title" style="font-size: 2rem">${selectedCat.name}</h2>
-                                    <p class="mb-1"><span class="font-bold">🐾 ${t('breed')}:</span> ${selectedCat.breed}</p>
-                                    ${selectedCat.gender ? `<p class="mb-1"><span class="font-bold">⚧️ ${t('gender')}:</span> ${selectedCat.gender}</p>` : ''}
-                                    ${selectedCat.color ? `<p class="mb-1"><span class="font-bold">🎨 ${t('color')}:</span> ${selectedCat.color}</p>` : ''}
-                                    <p class="mb-1"><span class="font-bold">⏰ ${lang === 'id' ? 'Umur' : 'Age'}:</span> ${calculateAge(selectedCat.birthDate)}</p>
-                                    ${selectedCat.weight ? `<p class="mb-1"><span class="font-bold">⚖️ ${t('weight')}:</span> ${selectedCat.weight} kg</p>` : ''}
-                                    ${selectedCat.notes ? `<p class="mt-2 text-gray">${selectedCat.notes}</p>` : ''}
-                                    
-                                    <div class="flex-row mt-2">
-                                        <button class="btn btn-info flex-1" onclick="formData=${JSON.stringify(selectedCat).replace(/"/g, '&quot;')}; page='add'; render()">✏️ ${t('edit')}</button>
-                                        <button class="btn btn-danger flex-1" onclick="deleteCat(${selectedCat.id})">🗑️ ${t('delete')}</button>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="card">
-                                <div class="card-body">
-                                    <div class="section-header">
-                                        <h3 class="section-title">💉 ${t('vaccines')}</h3>
-                                        <button class="btn btn-success" style="width:auto;padding:0.5rem 1rem" onclick="formData={}; page='addVaccine'; render()">+ ${t('add')}</button>
-                                    </div>
-                                    ${catVaccines.length === 0 ? 
-                                        `<p class="text-gray">${t('noData')}</p>` :
-                                        `${catVaccines.map(v => `
-                                            <div class="item-box">
-                                                <button class="delete-btn" onclick="deleteVaccine(${v.id})">🗑️</button>
-                                                <h4 class="font-bold">${v.name}</h4>
-                                                <p class="text-gray text-sm">📅 ${formatDate(v.date)}</p>
-                                                ${v.notes ? `<p class="text-gray text-sm mt-1">${v.notes}</p>` : ''}
-                                            </div>
-                                        `).join('')}`
-                                    }
-                                </div>
-                            </div>
-                            
-                            <div class="card">
-                                <div class="card-body">
-                                    <div class="section-header">
-                                        <h3 class="section-title">💊 ${t('medicines')}</h3>
-                                        <button class="btn btn-success" style="width:auto;padding:0.5rem 1rem" onclick="formData={}; page='addMedicine'; render()">+ ${t('add')}</button>
-                                    </div>
-                                    ${catMedicines.length === 0 ? 
-                                        `<p class="text-gray">${t('noData')}</p>` :
-                                        `${catMedicines.map(m => `
-                                            <div class="item-box">
-                                                <button class="delete-btn" onclick="deleteMedicine(${m.id})">🗑️</button>
-                                                <h4 class="font-bold">${m.name}</h4>
-                                                <p class="text-gray text-sm">💊 ${m.type}</p>
-                                                ${m.notes ? `<p class="text-gray text-sm mt-1">${m.notes}</p>` : ''}
-                                            </div>
-                                        `).join('')}`
-                                    }
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }
-            
-            else if (page === 'addVaccine') {
-                app.innerHTML = `
-                    <div class="fade-in">
-                        <div class="header" style="background: linear-gradient(135deg, #10b981, #14b8a6)">
-                            <div class="header-content container">
-                                <button class="back-btn" onclick="page='detail'; render()">←</button>
-                                <div class="title">${t('add')} ${t('vaccines')}</div>
-                            </div>
-                        </div>
-                        <div class="content container">
-                            <div class="card">
-                                <div class="card-body">
-                                    <input type="text" id="vName" class="input" placeholder="${lang === 'id' ? 'Nama Vaksin' : 'Vaccine Name'} *">
-                                    <input type="date" id="vDate" class="input">
-                                    <textarea id="vNotes" class="input" rows="4" placeholder="${t('notes')}"></textarea>
-                                    
-                                    <div class="flex-row">
-                                        <button class="btn btn-success flex-1" onclick="
-                                            formData.name = document.getElementById('vName').value;
-                                            formData.date = document.getElementById('vDate').value;
-                                            formData.notes = document.getElementById('vNotes').value;
-                                            saveVaccine();
-                                        ">💾 ${t('save')}</button>
-                                        <button class="btn btn-secondary flex-1" onclick="page='detail'; render()">❌ ${t('cancel')}</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }
-            
-            else if (page === 'addMedicine') {
-                app.innerHTML = `
-                    <div class="fade-in">
-                        <div class="header" style="background: linear-gradient(135deg, #8b5cf6, #a855f7)">
-                            <div class="header-content container">
-                                <button class="back-btn" onclick="page='detail'; render()">←</button>
-                                <div class="title">${t('add')} ${t('medicines')}</div>
-                            </div>
-                        </div>
-                        <div class="content container">
-                            <div class="card">
-                                <div class="card-body">
-                                    <input type="text" id="mName" class="input" placeholder="${lang === 'id' ? 'Nama Obat' : 'Medicine Name'} *">
-                                    <select id="mType" class="input">
-                                        <option value="">${lang === 'id' ? 'Tipe' : 'Type'}</option>
-                                        <option value="Medicine">${lang === 'id' ? 'Obat' : 'Medicine'}</option>
-                                        <option value="Vitamin">Vitamin</option>
-                                        <option value="Supplement">${lang === 'id' ? 'Suplemen' : 'Supplement'}</option>
-                                    </select>
-                                    <textarea id="mNotes" class="input" rows="4" placeholder="${t('notes')}"></textarea>
-                                    
-                                    <div class="flex-row">
-                                        <button class="btn btn-primary flex-1" onclick="
-                                            formData.name = document.getElementById('mName').value;
-                                            formData.type = document.getElementById('mType').value;
-                                            formData.notes = document.getElementById('mNotes').value;
-                                            saveMedicine();
-                                        ">💾 ${t('save')}</button>
-                                        <button class="btn btn-secondary flex-1" onclick="page='detail'; render()">❌ ${t('cancel')}</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }
-            
-            else if (page === 'settings') {
-                app.innerHTML = `
-                    <div class="fade-in">
-                        <div class="header" style="background: linear-gradient(135deg, #6b7280, #3b82f6)">
-                            <div class="header-content container">
-                                <button class="back-btn" onclick="page='home'; render()">←</button>
-                                <div class="title">⚙️ ${t('settings')}</div>
-                            </div>
-                        </div>
-                        <div class="content container">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h3 class="section-title mb-2">🌐 ${t('language')}</h3>
-                                    <div class="lang-selector">
-                                        <button class="lang-btn ${lang === 'id' ? 'active' : ''}" onclick="changeLang('id')">🇮🇩 Indonesia</button>
-                                        <button class="lang-btn ${lang === 'en' ? 'active' : ''}" onclick="changeLang('en')">🇬🇧 English</button>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="card">
-                                <div class="card-body">
-                                    <h3 class="section-title mb-2">🌙 ${t('darkMode')}</h3>
-                                    <button class="btn ${darkMode ? 'btn-primary' : 'btn-secondary'}" onclick="toggleDarkMode()">
-                                        ${darkMode ? '☀️ ' + (lang === 'id' ? 'Mode Terang' : 'Light') : '🌙 ' + (lang === 'id' ? 'Mode Gelap' : 'Dark')}
-                                    </button>
-                                </div>
-                            </div>
-                            
-                            <div class="card">
-                                <div class="card-body">
-                                    <h3 class="section-title mb-2">🎨 ${t('theme')}</h3>
-                                    <div class="theme-selector">
-                                        <div class="theme-box theme-pink ${currentTheme === 'pink' ? 'active' : ''}" onclick="changeTheme('pink')"></div>
-                                        <div class="theme-box theme-blue ${currentTheme === 'blue' ? 'active' : ''}" onclick="changeTheme('blue')"></div>
-                                        <div class="theme-box theme-green ${currentTheme === 'green' ? 'active' : ''}" onclick="changeTheme('green')"></div>
-                                        <div class="theme-box theme-orange ${currentTheme === 'orange' ? 'active' : ''}" onclick="changeTheme('orange')"></div>
-                                        <div class="theme-box theme-purple ${currentTheme === 'purple' ? 'active' : ''}" onclick="changeTheme('purple')"></div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="card">
-                                <div class="card-body">
-                                    <h3 class="section-title mb-2">💾 ${t('backup')}</h3>
-                                    <button class="btn btn-success" onclick="exportData()">📥 Download Backup</button>
-                                </div>
-                            </div>
-                            
-                            <div class="card">
-                                <div class="card-body">
-                                    <h3 class="section-title mb-2">📊 Stats</h3>
-                                    <p class="mb-1">🐱 ${lang === 'id' ? 'Total Kucing' : 'Total Cats'}: <span class="font-bold">${cats.length}</span></p>
-                                    <p class="mb-1">💉 ${lang === 'id' ? 'Total Vaksin' : 'Total Vaccines'}: <span class="font-bold">${vaccines.length}</span></p>
-                                    <p class="mb-1">💊 ${lang === 'id' ? 'Total Obat' : 'Total Medicines'}: <span class="font-bold">${medicines.length}</span></p>
-                                </div>
-                            </div>
-                            
-                            <div class="card">
-                                <div class="card-body">
-                                    <h3 class="section-title mb-2">ℹ️ About</h3>
-                                    <p class="text-gray text-sm">📱 Cat Story Lovers Ultimate</p>
-                                    <p class="text-gray text-sm">🔢 Version 3.0</p>
-                                    <p class="text-gray text-sm">👨‍💻 Made with ❤️</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
+                (function(file) {
+                    var reader = new FileReader();
+                    reader.onload = function(evt) {
+                        app.form.photos.push(evt.target.result);
+                        render();
+                    };
+                    reader.readAsDataURL(file);
+                })(files[i]);
             }
         }
-
-        // Initialize app
-        loadData();
-        render();
-        console.log('App loaded successfully!');
+        
+        function removePhoto(idx) {
+            app.form.photos.splice(idx, 1);
+            render();
+        }
+        
+        function openModal(url) {
+            document.getElementById('modalImg').src = url;
+            document.getElementById('modal').className = 'modal show';
+        }
+        
+        function closeModal() {
+            document.getElementById('modal').className = 'modal';
+        }
+        
+        function saveCat() {
+            if (!app.form.name || !app.form.breed) {
+                alert(app.lang === 'id' ? 'Nama dan jenis wajib diisi!' : 'Name and breed required!');
+                return;
+            }
+            
+            if (!app.form.photos) app.form.photos = [];
+            
+            if (app.form.id) {
+                for (var i = 0; i < app.cats.length; i++) {
+                    if (app.cats[i].id === app.form.id) {
+                        app.cats[i] = app.form;
+                        break;
+                    }
+                }
+            } else {
+                app.form.id = Date.now();
+                app.cats.push(app.form);
+            }
+            
+            saveData();
+            app.form = {};
+            app.page = 'home';
+            render();
+        }
+        
+        function delCat(id) {
+            if (confirm(app.lang === 'id' ? 'Hapus kucing ini?' : 'Delete this cat?')) {
+                app.cats = app.cats.filter(function(c) { return c.id !== id; });
+                app.vaccines = app.vaccines.filter(function(v) { return v.catId !== id; });
+                app.medicines = app.medicines.filter(function(m) { return m.catId !== id; });
+                saveData();
+                app.page = 'home';
+                render();
+            }
+        }
+        
+        function saveVaccine() {
+            if (!app.form.name || !app.form.date) {
+                alert(app.lang === 'id' ? 'Nama dan tanggal wajib!' : 'Name and date required!');
+                return;
+            }
+            app.form.id = Date.now();
+            app.form.catId = app.selected.id;
+            app.vaccines.push(app.form);
+            saveData();
+            app.form = {};
+            app.page = 'detail';
+            render();
+        }
+        
+        function delVaccine(id) {
+            app.vaccines = app.vaccines.filter(function(v) { return v.id !== id; });
+            saveData();
+            render();
+        }
+        
+        function saveMedicine() {
+            if (!app.form.name || !app.form.type) {
+                alert(app.lang === 'id' ? 'Nama dan tipe wajib!' : 'Name and type required!');
+                return;
+            }
+            app.form.id = Date.now();
+            app.form.catId = app.selected.id;
+            app.medicines.push(app.form);
+            saveData();
+            app.form = {};
+            app.page = 'detail';
+            render();
+        }
+        
+        function delMedicine(id) {
+            app.medicines = app.medicines.filter(function(m) { return m.id !== id; });
+            saveData();
+            render();
+        }
+        
+        function changeLang(lng) {
+            app.lang = lng;
+            saveData();
+            render();
+        }
+        
+        function changeTheme(thm) {
+            app.theme = thm;
+            saveData();
+            render();
+        }
+        
+        function render() {
+            var html = '';
+            var el = document.getElementById('app');
+            
+            if (app.page === 'home') {
+                html = '<div class="header"><div class="header-flex"><div><div class="title">🐱 ' + t('title') + '</div><div class="subtitle">' + t('total') + ': ' + app.cats.length + '</div></div><div class="btn-group"><button class="btn-icon" onclick="app.page=\'settings\';render()">⚙️</button><button class="btn-icon btn-add" onclick="app.form={photos:[]};app.page=\'add\';render()">+</button></div></div></div><div class="content">';
+                
+                if (app.cats.length === 0) {
+                    html += '<div class="empty"><div class="empty-icon">😿</div><h2>' + t('empty') + '</h2><p class="text-gray">' + t('clickAdd') + '</p></div>';
+                } else {
+                    html += '<div class="grid">';
+                    for (var i = 0; i < app.cats.length; i++) {
+                        var c = app.cats[i];
+                        html += '<div class="card" onclick="app.selected=' + JSON.stringify(c).replace(/"/g, '&quot;') + ';app.page=\'detail\';render()">';
+                        if (c.photos && c.photos.length > 0) {
+                            html += '<img src="' + c.photos[0] + '" class="card-img" alt="' + c.name + '">';
+                        } else {
+                            html += '<div class="card-placeholder">🐱</div>';
+                        }
+                        html += '<div class="card-body"><div class="card-title">' + c.name + '</div><div class="card-text">' + c.breed + '</div><div class="text-sm text-gray">⏰ ' + calcAge(c.birthDate) + '</div></div></div>';
+                    }
+                    html += '</div>';
+                }
+                html += '</div>';
+            }
+            
+            else if (app.page === 'add') {
+                html = '<div class="header"><div class="header-flex"><button class="back-btn" onclick="app.page=\'home\';render()">←</button><div class="title">' + (app.form.id ? t('edit') : t('add')) + ' ' + t('cat') + '</div></div></div><div class="content"><div class="card"><div class="card-body">';
+                
+                if (app.form.photos && app.form.photos.length > 0) {
+                    html += '<div class="photo-grid">';
+                    for (var i = 0; i < app.form.photos.length; i++) {
+                        html += '<div class="photo-box"><img src="' + app.form.photos[i] + '" onclick="openModal(\'' + app.form.photos[i] + '\')"><button class="photo-remove" onclick="event.stopPropagation();removePhoto(' + i + ')">×</button></div>';
+                    }
+                    html += '</div>';
+                }
+                
+                if (!app.form.photos || app.form.photos.length < 8) {
+                    html += '<input type="file" id="photoInput" accept="image/*" multiple onchange="uploadPhotos(event)"><label for="photoInput" class="file-upload"><div class="upload-icon">📸</div><div class="bold">' + t('uploadPhoto') + '</div><div class="text-sm text-gray">' + t('max8') + '</div></label>';
+                }
+                
+                html += '<input type="text" id="catName" class="input" placeholder="' + t('name') + ' *" value="' + (app.form.name || '') + '"><input type="text" id="catBreed" class="input" placeholder="' + t('breed') + ' *" value="' + (app.form.breed || '') + '"><select id="catGender" class="input"><option value="">' + t('gender') + '</option><option value="' + t('male') + '" ' + (app.form.gender === t('male') ? 'selected' : '') + '>' + t('male') + '</option><option value="' + t('female') + '" ' + (app.form.gender === t('female') ? 'selected' : '') + '>' + t('female') + '</option></select><input type="text" id="catColor" class="input" placeholder="' + t('color') + '" value="' + (app.form.color || '') + '"><input type="date" id="catBirth" class="input" value="' + (app.form.birthDate || '') + '">';
+                
+                if (app.form.birthDate) {
+                    html += '<p class="text-gray mb-1">⏰ ' + calcAge(app.form.birthDate) + '</p>';
+                }
+                
+                html += '<input type="number" step="0.1" id="catWeight" class="input" placeholder="' + t('weight') + ' (kg)" value="' + (app.form.weight || '') + '"><input type="number" id="catPrice" class="input" placeholder="' + t('price') + '" value="' + (app.form.price || '') + '"><textarea id="catNotes" class="input" rows="4" placeholder="' + t('notes') + '">' + (app.form.notes || '') + '</textarea><div class="flex"><button class="btn btn-primary flex-1" onclick="app.form.name=document.getElementById(\'catName\').value;app.form.breed=document.getElementById(\'catBreed\').value;app.form.gender=document.getElementById(\'catGender\').value;app.form.color=document.getElementById(\'catColor\').value;app.form.birthDate=document.getElementById(\'catBirth\').value;app.form.weight=document.getElementById(\'catWeight\').value;app.form.price=document.getElementById(\'catPrice\').value;app.form.notes=document.getElementById(\'catNotes\').value;saveCat()">💾 ' + t('save') + '</button><button class="btn btn-secondary flex-1" onclick="app.page=\'home\';render()">❌ ' + t('cancel') + '</button></div></div></div></div>';
+            }
+            
+            else if (app.page === 'detail') {
+                var vax = app.vaccines.filter(function(v) { return v.catId === app.selected.id; });
+                var med = app.medicines.filter(function(m) { return m.catId === app.selected.id; });
+                
+                html = '<div class="header"><div class="header-flex"><button class="back-btn" onclick="app.page=\'home\';render()">←</button><div class="title">' + t('detail') + '</div></div></div><div class="content"><div class="card">';
+                
+                if (app.selected.photos && app.selected.photos.length > 0) {
+                    html += '<img src="' + app.selected.photos[0] + '" class="card-img" onclick="openModal(\'' + app.selected.photos[0] + '\')">';
+                    if (app.selected.photos.length > 1) {
+                        html += '<div class="p-1"><div class="photo-grid">';
+                        for (var i = 1; i < app.selected.photos.length; i++) {
+                            html += '<div class="photo-box"><img src="' + app.selected.photos[i] + '" onclick="openModal(\'' + app.selected.photos[i] + '\')"></div>';
+                        }
+                        html += '</div></div>';
+                    }
+                } else {
+                    html += '<div class="card-placeholder">🐱</div>';
+                }
+                
+                html += '<div class="card-body"><h2 class="card-title">' + app.selected.name + '</h2><p class="mb-1"><span class="bold">🐾 ' + t('breed') + ':</span> ' + app.selected.breed + '</p>';
+                if (app.selected.gender) html += '<p class="mb-1"><span class="bold">⚧️ ' + t('gender') + ':</span> ' + app.selected.gender + '</p>';
+                if (app.selected.color) html += '<p class="mb-1"><span class="bold">🎨 ' + t('color') + ':</span> ' + app.selected.color + '</p>';
+                html += '<p class="mb-1"><span class="bold">⏰ ' + (app.lang === 'id' ? 'Umur' : 'Age') + ':</span> ' + calcAge(app.selected.birthDate) + '</p>';
+                if (app.selected.weight) html += '<p class="mb-1"><span class="bold">⚖️ ' + t('weight') + ':</span> ' + app.selected.weight + ' kg</p>';
+                if (app.selected.notes) html += '<p class="mt-1 text-gray">' + app.selected.notes + '</p>';
+                
+                html += '<div class="flex mt-1"><button class="btn btn-info flex-1" onclick="app.form=' + JSON.stringify(app.selected).replace(/"/g, '&quot;') + ';app.page=\'add\';render()">✏️ ' + t('edit') + '</button><button class="btn btn-danger flex-1" onclick="delCat(' + app.selected.id + ')">🗑️ ' + t('delete') + '</button></div></div></div>';
+                
+                html += '<div class="card"><div class="card-body"><div class="section-header"><h3 class="section-title">💉 ' + t('vaccines') + '</h3><button class="btn btn-success" style="width:auto;padding:10px 20px" onclick="app.form={};app.page=\'addVaccine\';render()">+ ' + t('add') + '</button></div>';
+                if (vax.length === 0) {
+                    html += '<p class="text-gray">' + t('noData') + '</p>';
+                } else {
+                    for (var i = 0; i < vax.length; i++) {
+                        html += '<div class="item-card"><button class="del-btn" onclick="delVaccine(' + vax[i].id + ')">🗑️</button><h4 class="bold">' + vax[i].name + '</h4><p class="text-gray text-sm">📅 ' + fmtDate(vax[i].date) + '</p>';
+                        if (vax[i].notes) html += '<p class="text-gray text-sm mt-1">' + vax[i].notes + '</p>';
+                        html += '</div>';
+                    }
+                }
+                html += '</div></div>';
+                
+                html += '<div class="card"><div class="card-body"><div class="section-header"><h3 class="section-title">💊 ' + t('medicines') + '</h3><button class="btn btn-success" style="width:auto;padding:10px 20px" onclick="app.form={};app.page=\'addMedicine\';render()">+ ' + t('add') + '</button></div>';
+                if (med.length === 0) {
+                    html += '<p class="text-gray">' + t('noData') + '</p>';
+                } else {
+                    for (var i = 0; i < med.length; i++) {
+                        html += '<div class="item-card"><button class="del-btn" onclick="delMedicine(' + med[i].id + ')">🗑️</button><h4 class="bold">' + med[i].name + '</h4><p class="text-gray text-sm">💊 ' + med[i].type + '</p>';
+                        if (med[i].notes) html += '<p class="text-gray text-sm mt-1">' + med[i].notes + '</p>';
+                        html += '</div>';
+                    }
+                }
+                html += '</div></div></div>';
+            }
+            
+            else if (app.page === 'addVaccine') {
+                html = '<div class="header" style="background:linear-gradient(135deg,#10b981,#14b8a6)"><div class="header-flex"><button class="back-btn" onclick="app.page=\'detail\';render()">←</button><div class="title">' + t('add') + ' ' + t('vaccines') + '</div></div></div><div class="content"><div class="card"><div class="card-body"><input type="text" id="vName" class="input" placeholder="' + (app.lang === 'id' ? 'Nama Vaksin' : 'Vaccine Name') + ' *"><input type="date" id="vDate" class="input"><textarea id="vNotes" class="input" rows="4" placeholder="' + t('notes') + '"></textarea><div class="flex"><button class="btn btn-success flex-1" onclick="app.form.name=document.getElementById(\'vName\').value;app.form.date=document.getElementById(\'vDate\').value;app.form.notes=document.getElementById(\'vNotes\').value;saveVaccine()">💾 ' + t('save') + '</button><button class="btn btn-secondary flex-1" onclick="app.page=\'detail\';render()">❌ ' + t('cancel') + '</button></div></div></div></div>';
+            }
+            
+            else if (app.page === 'addMedicine') {
+                html = '<div class="header" style="background:linear-gradient(135deg,#8b5cf6,#a855f7)"><div class="header-flex"><button class="back-btn" onclick="app.page=\'detail\';render()">←</button><div class="title">' + t('add') + ' ' + t('medicines') + '</div></div></div><div class="content"><div class="card"><div class="card-body"><input type="text" id="mName" class="input" placeholder="' + (app.lang === 'id' ? 'Nama Obat' : 'Medicine Name') + ' *"><select id="mType" class="input"><option value="">' + (app.lang === 'id' ? 'Tipe' : 'Type') + '</option><option value="Medicine">' + (app.lang === 'id' ? 'Obat' : 'Medicine') + '</option><option value="Vitamin">Vitamin</option><option value="Supplement">' + (app.lang === 'id' ? 'Suplemen' : 'Supplement') + '</option></select><textarea id="mNotes" class="input" rows="4" placeholder="' + t('notes') + '"></textarea><div class="flex"><button class="btn btn-primary flex-1" onclick="app.form.name=document.getElementById(\'mName\').value;app.form.type=document.getElementById(\'mType\').value;app.form.notes=document.getElementById(\'mNotes\').value;saveMedicine()">💾 ' + t('save') + '</button><button class="btn btn-secondary flex-1" onclick="app.page=\'detail\';render()">❌ ' + t('cancel') + '</button></div></div></div></div>';
+            }
+            
+            else if (app.page === 'settings') {
+                html = '<div class="header" style="background:linear-gradient(135deg,#6b7280,#3b82f6)"><div class="header-flex"><button class="back-btn" onclick="app.page=\'home\';render()">←</button><div class="title">⚙️ ' + t('settings') + '</div></div></div><div class="content"><div class="card"><div class="card-body"><h3 class="section-title mb-1">🌐 ' + t('language') + '</h3><div class="lang-btns"><button class="lang-btn ' + (app.lang === 'id' ? 'active' : '') + '" onclick="changeLang(\'id\')">🇮🇩 Indonesia</button><button class="lang-btn ' + (app.lang === 'en' ? 'active' : '') + '" onclick="changeLang(\'en\')">🇬🇧 English</button></div></div></div><div class="card"><div class="card-body"><h3 class="section-title mb-1">🎨 ' + t('theme') + '</h3><div class="theme-grid"><div class="theme-box theme-1 ' + (app.theme === 1 ? 'active' : '') + '" onclick="changeTheme(1)"></div><div class="theme-box theme-2 ' + (app.theme === 2 ? 'active' : '') + '" onclick="changeTheme(2)"></div><div class="theme-box theme-3 ' + (app.theme === 3 ? 'active' : '') + '" onclick="changeTheme(3)"></div><div class="theme-box theme-4 ' + (app.theme === 4 ? 'active' : '') + '" onclick="changeTheme(4)"></div><div class="theme-box theme-5 ' + (app.theme === 5 ? 'active' : '') + '" onclick="changeTheme(5)"></div></div></div></div><div class="card"><div class="card-body"><h3 class="section-title mb-1">📊 Stats</h3><p class="mb-1">🐱 ' + (app.lang === 'id' ? 'Total Kucing' : 'Total Cats') + ': <span class="bold">' + app.cats.length + '</span></p><p class="mb-1">💉 ' + (app.lang === 'id' ? 'Total Vaksin' : 'Total Vaccines') + ': <span class="bold">' + app.vaccines.length + '</span></p><p class="mb-1">💊 ' + (app.lang === 'id' ? 'Total Obat' : 'Total Medicines') + ': <span class="bold">' + app.medicines.length + '</span></p></div></div><div class="card"><div class="card-body"><h3 class="section-title mb-1">ℹ️ About</h3><p class="text-gray text-sm">📱 Cat Story Lovers</p><p class="text-gray text-sm">🔢 Version 3.0</p><p class="text-gray text-sm">👨‍💻 Made with ❤️</p></div></div></div>';
+            }
+            
+            el.innerHTML = html;
+        }
+        
+        // Initialize
+        console.log('Starting app...');
+        
+        try {
+            loadData();
+            console.log('Data loaded');
+            
+            setTimeout(function() {
+                render();
+                console.log('App rendered successfully!');
+            }, 100);
+        } catch (e) {
+            console.log('Init error:', e);
+            document.getElementById('app').innerHTML = '<div class="header"><div class="title">Error: ' + e.message + '</div></div><div class="content"><p>Please refresh the page</p></div>';
+        }
     </script>
 </body>
 </html>
