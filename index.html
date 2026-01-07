@@ -1,0 +1,1441 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cat Story Lovers</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        body { 
+            margin: 0; 
+            padding: 0; 
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .fade-in { animation: fadeIn 0.3s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #e5e5e5;
+        }
+        .dark-mode .bg-white { background-color: #2a2a2a !important; }
+        .dark-mode .text-gray-800 { color: #e5e5e5 !important; }
+        .dark-mode .text-gray-600 { color: #b0b0b0 !important; }
+        .dark-mode .text-gray-500 { color: #909090 !important; }
+        .dark-mode .text-gray-400 { color: #707070 !important; }
+        .dark-mode .border-gray-200 { border-color: #404040 !important; }
+        .dark-mode .border-gray-300 { border-color: #505050 !important; }
+        .dark-mode input, .dark-mode textarea, .dark-mode select {
+            background-color: #333 !important;
+            color: #e5e5e5 !important;
+            border-color: #505050 !important;
+        }
+        
+        /* File input styles */
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            width: 100%;
+        }
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: -9999px;
+        }
+        .file-input-label {
+            display: block;
+            padding: 1rem;
+            border: 2px dashed #d1d5db;
+            border-radius: 0.75rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .file-input-label:hover {
+            border-color: var(--theme-color, #ec4899);
+            background-color: var(--theme-bg, #fdf2f8);
+        }
+        
+        /* Image gallery styles */
+        .photo-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .photo-item {
+            position: relative;
+            aspect-ratio: 1;
+            border-radius: 10px;
+            overflow: hidden;
+            cursor: pointer;
+        }
+        .photo-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .photo-item .remove-photo {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: rgba(239, 68, 68, 0.9);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Calendar styles */
+        .calendar {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+        }
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            padding: 5px;
+            font-size: 0.9rem;
+            position: relative;
+        }
+        .calendar-day.has-event {
+            background: linear-gradient(135deg, var(--theme-color, #ec4899), var(--theme-color-secondary, #a855f7));
+            color: white;
+            font-weight: bold;
+        }
+        .calendar-day.today {
+            border: 2px solid var(--theme-color, #ec4899);
+        }
+        
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            animation: fadeIn 0.3s;
+        }
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-content {
+            max-width: 90%;
+            max-height: 90%;
+        }
+        .modal-content img {
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+        }
+        
+        /* Theme variables */
+        :root {
+            --theme-color: #ec4899;
+            --theme-color-secondary: #a855f7;
+            --theme-bg: #fdf2f8;
+        }
+        
+        [data-theme="blue"] {
+            --theme-color: #3b82f6;
+            --theme-color-secondary: #06b6d4;
+            --theme-bg: #eff6ff;
+        }
+        
+        [data-theme="green"] {
+            --theme-color: #10b981;
+            --theme-color-secondary: #14b8a6;
+            --theme-bg: #ecfdf5;
+        }
+        
+        [data-theme="orange"] {
+            --theme-color: #f97316;
+            --theme-color-secondary: #f59e0b;
+            --theme-bg: #fff7ed;
+        }
+        
+        [data-theme="purple"] {
+            --theme-color: #8b5cf6;
+            --theme-color-secondary: #a855f7;
+            --theme-bg: #faf5ff;
+        }
+    </style>
+</head>
+<body>
+    <div id="app"></div>
+    
+    <!-- Image Modal -->
+    <div id="imageModal" class="modal" onclick="closeModal()">
+        <div class="modal-content">
+            <img id="modalImage" src="" alt="Full size">
+        </div>
+    </div>
+
+    <script>
+        // Translations
+        const translations = {
+            id: {
+                myTitle: 'Cat Story Lovers',
+                total: 'Total',
+                noCats: 'Belum ada kucing',
+                clickAdd: 'Klik tombol + untuk menambahkan',
+                add: 'Tambah',
+                edit: 'Edit',
+                cat: 'Kucing',
+                detail: 'Detail Kucing',
+                photos: 'Foto',
+                selectPhotos: 'Pilih Foto dari Galeri',
+                tapUpload: 'Tap untuk upload foto',
+                maxPhotos: 'Maksimal 8 foto, 5MB per foto',
+                orUrl: 'atau',
+                photoUrl: 'URL Foto',
+                name: 'Nama Kucing',
+                breed: 'Jenis Kucing',
+                gender: 'Jenis Kelamin',
+                choose: 'Pilih...',
+                male: 'Jantan',
+                female: 'Betina',
+                color: 'Warna',
+                birthDate: 'Tanggal Lahir',
+                weight: 'Berat',
+                price: 'Harga',
+                notes: 'Catatan',
+                save: 'Simpan',
+                cancel: 'Batal',
+                delete: 'Hapus',
+                vaccines: 'Vaksin',
+                medicines: 'Obat',
+                noData: 'Belum ada data',
+                vaccine: 'Vaksin',
+                medicine: 'Obat',
+                type: 'Tipe',
+                dosage: 'Dosis',
+                duration: 'Durasi',
+                days: 'hari',
+                reminder: 'Reminder',
+                activeReminder: 'Reminder aktif',
+                settings: 'Pengaturan',
+                statistics: 'Statistik',
+                backup: 'Backup & Restore',
+                download: 'Download Backup Data',
+                restore: 'Restore Data',
+                upload: 'Upload file backup .json',
+                dangerZone: 'Zona Berbahaya',
+                deleteAll: 'Hapus Semua Data',
+                about: 'Tentang Aplikasi',
+                version: 'Versi',
+                theme: 'Tema Warna',
+                darkMode: 'Mode Gelap',
+                language: 'Bahasa',
+                share: 'Bagikan',
+                calendar: 'Kalender Vaksin',
+                weightChart: 'Grafik Berat Badan',
+                addWeight: 'Tambah Catatan Berat',
+                date: 'Tanggal',
+                nextVaccine: 'Berikutnya',
+                notifications: 'Notifikasi',
+                notificationPermission: 'Izin Notifikasi',
+                enable: 'Aktifkan',
+                kg: 'kg'
+            },
+            en: {
+                myTitle: 'Cat Story Lovers',
+                total: 'Total',
+                noCats: 'No cats yet',
+                clickAdd: 'Click + button to add',
+                add: 'Add',
+                edit: 'Edit',
+                cat: 'Cat',
+                detail: 'Cat Detail',
+                photos: 'Photos',
+                selectPhotos: 'Select Photos from Gallery',
+                tapUpload: 'Tap to upload photos',
+                maxPhotos: 'Max 8 photos, 5MB per photo',
+                orUrl: 'or',
+                photoUrl: 'Photo URL',
+                name: 'Cat Name',
+                breed: 'Breed',
+                gender: 'Gender',
+                choose: 'Choose...',
+                male: 'Male',
+                female: 'Female',
+                color: 'Color',
+                birthDate: 'Birth Date',
+                weight: 'Weight',
+                price: 'Price',
+                notes: 'Notes',
+                save: 'Save',
+                cancel: 'Cancel',
+                delete: 'Delete',
+                vaccines: 'Vaccines',
+                medicines: 'Medicines',
+                noData: 'No data yet',
+                vaccine: 'Vaccine',
+                medicine: 'Medicine',
+                type: 'Type',
+                dosage: 'Dosage',
+                duration: 'Duration',
+                days: 'days',
+                reminder: 'Reminder',
+                activeReminder: 'Reminder active',
+                settings: 'Settings',
+                statistics: 'Statistics',
+                backup: 'Backup & Restore',
+                download: 'Download Backup Data',
+                restore: 'Restore Data',
+                upload: 'Upload backup .json file',
+                dangerZone: 'Danger Zone',
+                deleteAll: 'Delete All Data',
+                about: 'About App',
+                version: 'Version',
+                theme: 'Theme Color',
+                darkMode: 'Dark Mode',
+                language: 'Language',
+                share: 'Share',
+                calendar: 'Vaccine Calendar',
+                weightChart: 'Weight Chart',
+                addWeight: 'Add Weight Record',
+                date: 'Date',
+                nextVaccine: 'Next',
+                notifications: 'Notifications',
+                notificationPermission: 'Notification Permission',
+                enable: 'Enable',
+                kg: 'kg'
+            }
+        };
+
+        let lang = 'id';
+        let page = 'home';
+        let cats = [];
+        let vaccines = [];
+        let medicines = [];
+        let weightRecords = [];
+        let selectedCat = null;
+        let formData = {};
+        let darkMode = false;
+        let currentTheme = 'pink';
+
+        function t(key) {
+            return translations[lang][key] || key;
+        }
+
+        function loadData() {
+            const savedCats = localStorage.getItem('cats');
+            const savedVaccines = localStorage.getItem('vaccines');
+            const savedMedicines = localStorage.getItem('medicines');
+            const savedWeights = localStorage.getItem('weightRecords');
+            const savedLang = localStorage.getItem('language');
+            const savedDarkMode = localStorage.getItem('darkMode');
+            const savedTheme = localStorage.getItem('theme');
+            
+            if (savedCats) cats = JSON.parse(savedCats);
+            if (savedVaccines) vaccines = JSON.parse(savedVaccines);
+            if (savedMedicines) medicines = JSON.parse(savedMedicines);
+            if (savedWeights) weightRecords = JSON.parse(savedWeights);
+            if (savedLang) lang = savedLang;
+            if (savedDarkMode) darkMode = savedDarkMode === 'true';
+            if (savedTheme) currentTheme = savedTheme;
+            
+            applyDarkMode();
+            applyTheme();
+        }
+
+        function saveData() {
+            localStorage.setItem('cats', JSON.stringify(cats));
+            localStorage.setItem('vaccines', JSON.stringify(vaccines));
+            localStorage.setItem('medicines', JSON.stringify(medicines));
+            localStorage.setItem('weightRecords', JSON.stringify(weightRecords));
+            localStorage.setItem('language', lang);
+            localStorage.setItem('darkMode', darkMode);
+            localStorage.setItem('theme', currentTheme);
+        }
+
+        function applyDarkMode() {
+            if (darkMode) {
+                document.body.classList.add('dark-mode');
+            } else {
+                document.body.classList.remove('dark-mode');
+            }
+        }
+
+        function applyTheme() {
+            document.documentElement.setAttribute('data-theme', currentTheme);
+        }
+
+        function toggleDarkMode() {
+            darkMode = !darkMode;
+            applyDarkMode();
+            saveData();
+            render();
+        }
+
+        function changeTheme(theme) {
+            currentTheme = theme;
+            applyTheme();
+            saveData();
+            render();
+        }
+
+        function changeLang(newLang) {
+            lang = newLang;
+            saveData();
+            render();
+        }
+
+        function calculateAge(birthDate) {
+            if (!birthDate) return t('noData');
+            const today = new Date();
+            const birth = new Date(birthDate);
+            const years = Math.floor((today - birth) / (365.25 * 24 * 60 * 60 * 1000));
+            const months = Math.floor(((today - birth) % (365.25 * 24 * 60 * 60 * 1000)) / (30.44 * 24 * 60 * 60 * 1000));
+            return `${years} ${lang === 'id' ? 'tahun' : 'years'} ${months} ${lang === 'id' ? 'bulan' : 'months'}`;
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return t('noData');
+            const date = new Date(dateString);
+            const monthsId = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agt', 'Sep', 'Okt', 'Nov', 'Des'];
+            const monthsEn = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            const months = lang === 'id' ? monthsId : monthsEn;
+            return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
+        }
+
+        function handleMultipleImageUpload(event) {
+            const files = event.target.files;
+            if (!formData.photos) formData.photos = [];
+            
+            Array.from(files).forEach(file => {
+                if (formData.photos.length >= 8) {
+                    alert(lang === 'id' ? 'Maksimal 8 foto!' : 'Maximum 8 photos!');
+                    return;
+                }
+                
+                if (file.size > 5000000) {
+                    alert(lang === 'id' ? 'Ukuran file terlalu besar! Maksimal 5MB' : 'File too large! Max 5MB');
+                    return;
+                }
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    formData.photos.push(e.target.result);
+                    render();
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function removePhoto(index) {
+            formData.photos.splice(index, 1);
+            render();
+        }
+
+        function openModal(photoUrl) {
+            document.getElementById('modalImage').src = photoUrl;
+            document.getElementById('imageModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('imageModal').classList.remove('active');
+        }
+
+        function saveCat() {
+            if (!formData.name || !formData.breed) {
+                alert(lang === 'id' ? 'Nama dan jenis kucing wajib diisi!' : 'Name and breed are required!');
+                return;
+            }
+            if (!formData.photos) formData.photos = [];
+            if (formData.id) {
+                cats = cats.map(c => c.id === formData.id ? formData : c);
+            } else {
+                cats.push({ ...formData, id: Date.now() });
+            }
+            saveData();
+            formData = {};
+            page = 'home';
+            render();
+        }
+
+        function deleteCat(id) {
+            if (confirm(lang === 'id' ? 'Yakin hapus data kucing ini?' : 'Delete this cat?')) {
+                cats = cats.filter(c => c.id !== id);
+                vaccines = vaccines.filter(v => v.catId !== id);
+                medicines = medicines.filter(m => m.catId !== id);
+                weightRecords = weightRecords.filter(w => w.catId !== id);
+                saveData();
+                page = 'home';
+                render();
+            }
+        }
+
+        function saveVaccine() {
+            if (!formData.name || !formData.date) {
+                alert(lang === 'id' ? 'Nama vaksin dan tanggal wajib diisi!' : 'Vaccine name and date are required!');
+                return;
+            }
+            vaccines.push({ ...formData, id: Date.now(), catId: selectedCat.id });
+            
+            // Schedule notification if reminder is enabled
+            if (formData.reminder && formData.nextDate) {
+                scheduleNotification(formData.name, formData.nextDate, 'vaccine');
+            }
+            
+            saveData();
+            formData = {};
+            page = 'detail';
+            render();
+        }
+
+        function deleteVaccine(id) {
+            if (confirm(lang === 'id' ? 'Hapus data vaksin ini?' : 'Delete this vaccine?')) {
+                vaccines = vaccines.filter(v => v.id !== id);
+                saveData();
+                render();
+            }
+        }
+
+        function saveMedicine() {
+            if (!formData.name || !formData.type || !formData.dosage || !formData.duration) {
+                alert(lang === 'id' ? 'Semua field wajib diisi!' : 'All fields are required!');
+                return;
+            }
+            medicines.push({ ...formData, id: Date.now(), catId: selectedCat.id });
+            
+            // Schedule notification if reminder is enabled
+            if (formData.reminder) {
+                scheduleNotification(formData.name, new Date(), 'medicine');
+            }
+            
+            saveData();
+            formData = {};
+            page = 'detail';
+            render();
+        }
+
+        function deleteMedicine(id) {
+            if (confirm(lang === 'id' ? 'Hapus data obat ini?' : 'Delete this medicine?')) {
+                medicines = medicines.filter(m => m.id !== id);
+                saveData();
+                render();
+            }
+        }
+
+        function saveWeightRecord() {
+            if (!formData.weight || !formData.date) {
+                alert(lang === 'id' ? 'Berat dan tanggal wajib diisi!' : 'Weight and date are required!');
+                return;
+            }
+            weightRecords.push({ 
+                weight: parseFloat(formData.weight), 
+                date: formData.date, 
+                catId: selectedCat.id,
+                id: Date.now()
+            });
+            saveData();
+            formData = {};
+            page = 'weightChart';
+            render();
+        }
+
+        function deleteWeightRecord(id) {
+            weightRecords = weightRecords.filter(w => w.id !== id);
+            saveData();
+            render();
+        }
+
+        function requestNotificationPermission() {
+            if ('Notification' in window && Notification.permission === 'default') {
+                Notification.requestPermission().then(permission => {
+                    if (permission === 'granted') {
+                        alert(lang === 'id' ? 'Notifikasi diaktifkan!' : 'Notifications enabled!');
+                    }
+                });
+            }
+        }
+
+        function scheduleNotification(title, date, type) {
+            if ('Notification' in window && Notification.permission === 'granted') {
+                const targetDate = new Date(date);
+                const now = new Date();
+                const timeDiff = targetDate - now;
+                
+                if (timeDiff > 0) {
+                    setTimeout(() => {
+                        new Notification('🐱 ' + title, {
+                            body: type === 'vaccine' ? 
+                                (lang === 'id' ? 'Waktunya vaksin!' : 'Vaccine time!') :
+                                (lang === 'id' ? 'Waktunya minum obat!' : 'Medicine time!'),
+                            icon: '🐱'
+                        });
+                    }, timeDiff);
+                }
+            }
+        }
+
+        function shareToWhatsApp() {
+            if (!selectedCat) return;
+            
+            const text = `*${selectedCat.name}*\n` +
+                `${t('breed')}: ${selectedCat.breed}\n` +
+                `${t('gender')}: ${selectedCat.gender || '-'}\n` +
+                `${t('color')}: ${selectedCat.color || '-'}\n` +
+                `${lang === 'id' ? 'Umur' : 'Age'}: ${calculateAge(selectedCat.birthDate)}`;
+            
+            const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
+            window.open(url, '_blank');
+        }
+
+        function exportData() {
+            const data = {
+                cats,
+                vaccines,
+                medicines,
+                weightRecords,
+                exportDate: new Date().toISOString()
+            };
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'cat-data-backup.json';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function importData(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const data = JSON.parse(e.target.result);
+                        if (confirm(lang === 'id' ? 'Import data ini? Data lama akan diganti!' : 'Import this data? Old data will be replaced!')) {
+                            cats = data.cats || [];
+                            vaccines = data.vaccines || [];
+                            medicines = data.medicines || [];
+                            weightRecords = data.weightRecords || [];
+                            saveData();
+                            render();
+                            alert(lang === 'id' ? 'Data berhasil diimport!' : 'Data imported successfully!');
+                        }
+                    } catch (error) {
+                        alert(lang === 'id' ? 'File tidak valid!' : 'Invalid file!');
+                    }
+                };
+                reader.readAsText(file);
+            }
+        }
+
+        function renderCalendar() {
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = today.getMonth();
+            
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            
+            let calendarHTML = '<div class="calendar">';
+            
+            // Day headers
+            const dayNames = lang === 'id' ? ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'] : ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            dayNames.forEach(day => {
+                calendarHTML += `<div class="font-bold text-center p-2">${day}</div>`;
+            });
+            
+            // Empty cells before first day
+            for (let i = 0; i < firstDay; i++) {
+                calendarHTML += '<div class="calendar-day"></div>';
+            }
+            
+            // Days with events
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const hasVaccine = vaccines.some(v => v.date === dateStr || v.nextDate === dateStr);
+                const isToday = day === today.getDate();
+                
+                const classes = ['calendar-day'];
+                if (hasVaccine) classes.push('has-event');
+                if (isToday) classes.push('today');
+                
+                calendarHTML += `<div class="${classes.join(' ')}">${day}</div>`;
+            }
+            
+            calendarHTML += '</div>';
+            return calendarHTML;
+        }
+
+        function renderWeightChart() {
+            setTimeout(() => {
+                const canvas = document.getElementById('weightChart');
+                if (!canvas) return;
+                
+                const catWeights = weightRecords
+                    .filter(w => w.catId === selectedCat.id)
+                    .sort((a, b) => new Date(a.date) - new Date(b.date));
+                
+                if (catWeights.length === 0) return;
+                
+                const ctx = canvas.getContext('2d');
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: catWeights.map(w => formatDate(w.date)),
+                        datasets: [{
+                            label: t('weight') + ' (kg)',
+                            data: catWeights.map(w => w.weight),
+                            borderColor: 'rgb(236, 72, 153)',
+                            backgroundColor: 'rgba(236, 72, 153, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: false,
+                                ticks: {
+                                    callback: function(value) {
+                                        return value + ' kg';
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }, 100);
+        }
+
+        function getThemeGradient() {
+            const themes = {
+                pink: 'from-pink-500 to-purple-600',
+                blue: 'from-blue-500 to-cyan-600',
+                green: 'from-green-500 to-teal-600',
+                orange: 'from-orange-500 to-amber-600',
+                purple: 'from-purple-500 to-fuchsia-600'
+            };
+            return themes[currentTheme] || themes.pink;
+        }
+
+        function getThemeBg() {
+            const themes = {
+                pink: 'from-pink-100 via-purple-100 to-blue-100',
+                blue: 'from-blue-100 via-cyan-100 to-sky-100',
+                green: 'from-green-100 via-teal-100 to-emerald-100',
+                orange: 'from-orange-100 via-amber-100 to-yellow-100',
+                purple: 'from-purple-100 via-fuchsia-100 to-pink-100'
+            };
+            return themes[currentTheme] || themes.pink;
+        }
+
+        function render() {
+            const app = document.getElementById('app');
+            const gradient = getThemeGradient();
+            const bgGradient = getThemeBg();
+            
+            if (page === 'home') {
+                app.innerHTML = `
+                    <div class="min-h-screen bg-gradient-to-br ${bgGradient} fade-in">
+                        <div class="bg-gradient-to-r ${gradient} p-6 shadow-xl">
+                            <div class="flex justify-between items-center max-w-6xl mx-auto">
+                                <div>
+                                    <h1 class="text-3xl font-bold text-white">🐱 ${t('myTitle')}</h1>
+                                    <p class="text-white text-sm mt-1">${t('total')}: ${cats.length} ${lang === 'id' ? 'kucing' : 'cats'}</p>
+                                </div>
+                                <div class="flex gap-3">
+                                    <button onclick="toggleDarkMode()" 
+                                        class="bg-white bg-opacity-20 text-white w-12 h-12 rounded-full shadow-lg hover:shadow-2xl transform hover:scale-110 transition flex items-center justify-center text-2xl">
+                                        ${darkMode ? '☀️' : '🌙'}
+                                    </button>
+                                    <button onclick="page='calendar'; render();" 
+                                        class="bg-white bg-opacity-20 text-white w-12 h-12 rounded-full shadow-lg hover:shadow-2xl transform hover:scale-110 transition flex items-center justify-center text-2xl">
+                                        📅
+                                    </button>
+                                    <button onclick="page='settings'; render();" 
+                                        class="bg-white bg-opacity-20 text-white w-12 h-12 rounded-full shadow-lg hover:shadow-2xl transform hover:scale-110 transition flex items-center justify-center text-2xl">
+                                        ⚙️
+                                    </button>
+                                    <button onclick="formData={}; formData.photos=[]; page='add'; render();" 
+                                        class="bg-white text-pink-600 w-14 h-14 rounded-full shadow-lg hover:shadow-2xl transform hover:scale-110 transition flex items-center justify-center text-3xl font-bold">
+                                        +
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-6 max-w-6xl mx-auto">
+                            ${cats.length === 0 ? `
+                                <div class="text-center py-20">
+                                    <div class="text-9xl mb-6">😿</div>
+                                    <p class="text-2xl text-gray-600 font-semibold mb-2">${t('noCats')}</p>
+                                    <p class="text-gray-500">${t('clickAdd')}</p>
+                                </div>
+                            ` : `
+                                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                    ${cats.map(cat => `
+                                        <div onclick="selectedCat=${JSON.stringify(cat).replace(/"/g, '&quot;')}; page='detail'; render();" 
+                                            class="bg-white rounded-2xl shadow-lg overflow-hidden cursor-pointer hover:shadow-2xl transform hover:scale-105 transition">
+                                            ${cat.photos && cat.photos.length > 0 ? 
+                                                `<img src="${cat.photos[0]}" alt="${cat.name}" class="w-full h-56 object-cover">` :
+                                                `<div class="w-full h-56 bg-gradient-to-br from-pink-300 to-purple-300 flex items-center justify-center">
+                                                    <span class="text-8xl">🐱</span>
+                                                </div>`
+                                            }
+                                            <div class="p-5">
+                                                <h3 class="text-2xl font-bold text-gray-800 mb-1">${cat.name}</h3>
+                                                <p class="text-gray-600 mb-2">${cat.breed}</p>
+                                                <p class="text-sm text-gray-500">⏰ ${calculateAge(cat.birthDate)}</p>
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            `}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            else if (page === 'add') {
+                app.innerHTML = `
+                    <div class="min-h-screen bg-gradient-to-br ${bgGradient} fade-in">
+                        <div class="bg-gradient-to-r ${gradient} p-6 shadow-xl">
+                            <div class="flex items-center gap-4 max-w-2xl mx-auto">
+                                <button onclick="page='home'; render();" class="text-white p-2 rounded-lg hover:bg-white hover:bg-opacity-20 text-2xl">←</button>
+                                <h1 class="text-2xl font-bold text-white">${formData.id ? t('edit') : t('add')} ${t('cat')}</h1>
+                            </div>
+                        </div>
+                        <div class="p-6 max-w-2xl mx-auto">
+                            <div class="bg-white rounded-2xl shadow-xl p-8 space-y-6">
+                                <div>
+                                    <label class="block font-bold mb-3 text-lg">📸 ${t('photos')}</label>
+                                    ${formData.photos && formData.photos.length > 0 ? `
+                                        <div class="photo-gallery">
+                                            ${formData.photos.map((photo, index) => `
+                                                <div class="photo-item">
+                                                    <img src="${photo}" alt="Photo ${index + 1}" onclick="openModal('${photo}')">
+                                                    <button onclick="event.stopPropagation(); removePhoto(${index})" class="remove-photo">×</button>
+                                                </div>
+                                            `).join('')}
+                                        </div>
+                                    ` : ''}
+                                    
+                                    ${formData.photos && formData.photos.length < 8 ? `
+                                        <div class="file-input-wrapper mt-4">
+                                            <input type="file" id="photoFiles" accept="image/*" multiple onchange="handleMultipleImageUpload(event)">
+                                            <label for="photoFiles" class="file-input-label">
+                                                <div class="text-5xl mb-3">📸</div>
+                                                <div class="font-bold text-lg text-gray-700">${t('selectPhotos')}</div>
+                                                <div class="text-sm text-gray-500 mt-2">${t('tapUpload')}</div>
+                                                <div class="text-xs text-gray-400 mt-1">${t('maxPhotos')}</div>
+                                            </label>
+                                        </div>
+                                    ` : ''}
+                                </div>
+                                
+                                <div>
+                                    <label class="block font-bold mb-3 text-lg">🏷️ ${t('name')} *</label>
+                                    <input type="text" id="name" value="${formData.name || ''}" 
+                                        placeholder="Mimi, Leo, Luna"
+                                        class="w-full p-4 border-2 border-gray-300 rounded-xl text-lg">
+                                </div>
+                                
+                                <div>
+                                    <label class="block font-bold mb-3 text-lg">🐾 ${t('breed')} *</label>
+                                    <input type="text" id="breed" value="${formData.breed || ''}" 
+                                        placeholder="Persian, Anggora"
+                                        class="w-full p-4 border-2 border-gray-300 rounded-xl text-lg">
+                                </div>
+                                
+                                <div>
+                                    <label class="block font-bold mb-3 text-lg">⚧️ ${t('gender')}</label>
+                                    <select id="gender" class="w-full p-4 border-2 border-gray-300 rounded-xl text-lg">
+                                        <option value="">${t('choose')}</option>
+                                        <option value="${t('male')}" ${formData.gender === t('male') ? 'selected' : ''}>${t('male')}</option>
+                                        <option value="${t('female')}" ${formData.gender === t('female') ? 'selected' : ''}>${t('female')}</option>
+                                    </select>
+                                </div>
+                                
+                                <div>
+                                    <label class="block font-bold mb-3 text-lg">🎨 ${t('color')}</label>
+                                    <input type="text" id="color" value="${formData.color || ''}" 
+                                        placeholder="Orange, White"
+                                        class="w-full p-4 border-2 border-gray-300 rounded-xl text-lg">
+                                </div>
+                                
+                                <div>
+                                    <label class="block font-bold mb-3 text-lg">🎂 ${t('birthDate')}</label>
+                                    <input type="date" id="birthDate" value="${formData.birthDate || ''}" 
+                                        class="w-full p-4 border-2 border-gray-300 rounded-xl text-lg">
+                                    ${formData.birthDate ? `<p class="text-gray-600 mt-2">⏰ ${calculateAge(formData.birthDate)}</p>` : ''}
+                                </div>
+                                
+                                <div>
+                                    <label class="block font-bold mb-3 text-lg">⚖️ ${t('weight')} (${t('kg')})</label>
+                                    <input type="number" step="0.1" id="weight" value="${formData.weight || ''}" 
+                                        placeholder="3.5"
+                                        class="w-full p-4 border-2 border-gray-300 rounded-xl text-lg">
+                                </div>
+                                
+                                <div>
+                                    <label class="block font-bold mb-3 text-lg">💰 ${t('price')}</label>
+                                    <input type="number" id="price" value="${formData.price || ''}" 
+                                        placeholder="5000000"
+                                        class="w-full p-4 border-2 border-gray-300 rounded-xl text-lg">
+                                </div>
+                                
+                                <div>
+                                    <label class="block font-bold mb-3 text-lg">📝 ${t('notes')}</label>
+                                    <textarea id="notes" rows="4" 
+                                        class="w-full p-4 border-2 border-gray-300 rounded-xl text-lg"
+                                        placeholder="${lang === 'id' ? 'Suka bermain, alergi seafood, dll' : 'Likes to play, allergic to seafood, etc'}">${formData.notes || ''}</textarea>
+                                </div>
+                                
+                                <div class="flex gap-4">
+                                    <button onclick="
+                                        formData.name = document.getElementById('name').value;
+                                        formData.breed = document.getElementById('breed').value;
+                                        formData.gender = document.getElementById('gender').value;
+                                        formData.color = document.getElementById('color').value;
+                                        formData.birthDate = document.getElementById('birthDate').value;
+                                        formData.weight = document.getElementById('weight').value;
+                                        formData.price = document.getElementById('price').value;
+                                        formData.notes = document.getElementById('notes').value;
+                                        saveCat();
+                                    " class="flex-1 bg-gradient-to-r ${gradient} text-white py-4 rounded-xl font-bold text-lg hover:shadow-xl">
+                                        💾 ${t('save')}
+                                    </button>
+                                    <button onclick="page='home'; render();" 
+                                        class="flex-1 bg-gray-400 text-white py-4 rounded-xl font-bold text-lg">
+                                        ❌ ${t('cancel')}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            else if (page === 'detail') {
+                const catVaccines = vaccines.filter(v => v.catId === selectedCat.id);
+                const catMedicines = medicines.filter(m => m.catId === selectedCat.id);
+                const catWeights = weightRecords.filter(w => w.catId === selectedCat.id).sort((a, b) => new Date(b.date) - new Date(a.date));
+                
+                app.innerHTML = `
+                    <div class="min-h-screen bg-gradient-to-br ${bgGradient} fade-in">
+                        <div class="bg-gradient-to-r ${gradient} p-6 shadow-xl">
+                            <div class="flex items-center gap-4 max-w-4xl mx-auto">
+                                <button onclick="page='home'; render();" class="text-white p-2 rounded-lg hover:bg-white hover:bg-opacity-20 text-2xl">←</button>
+                                <h1 class="text-2xl font-bold text-white">${t('detail')}</h1>
+                                <button onclick="shareToWhatsApp()" 
+                                    class="ml-auto bg-green-500 text-white px-4 py-2 rounded-xl font-bold hover:bg-green-600">
+                                    📤 ${t('share')}
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="p-6 max-w-4xl mx-auto space-y-6">
+                            <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+                                ${selectedCat.photos && selectedCat.photos.length > 0 ? `
+                                    <div class="relative">
+                                        <img src="${selectedCat.photos[0]}" class="w-full h-72 object-cover" onclick="openModal('${selectedCat.photos[0]}')">
+                                        ${selectedCat.photos.length > 1 ? `
+                                            <div class="absolute bottom-4 right-4 bg-black bg-opacity-50 text-white px-3 py-1 rounded-full">
+                                                +${selectedCat.photos.length - 1} ${lang === 'id' ? 'foto' : 'photos'}
+                                            </div>
+                                        ` : ''}
+                                    </div>
+                                    ${selectedCat.photos.length > 1 ? `
+                                        <div class="p-4 photo-gallery">
+                                            ${selectedCat.photos.slice(1).map(photo => `
+                                                <div class="photo-item">
+                                                    <img src="${photo}" alt="Photo" onclick="openModal('${photo}')">
+                                                </div>
+                                            `).join('')}
+                                        </div>
+                                    ` : ''}
+                                ` : `
+                                    <div class="w-full h-72 bg-gradient-to-br from-pink-300 to-purple-300 flex items-center justify-center">
+                                        <span class="text-9xl">🐱</span>
+                                    </div>
+                                `}
+                                
+                                <div class="p-8">
+                                    <h2 class="text-4xl font-bold text-gray-800 mb-4">${selectedCat.name}</h2>
+                                    <div class="space-y-2 text-lg">
+                                        <p><span class="font-bold">🐾 ${t('breed')}:</span> ${selectedCat.breed}</p>
+                                        ${selectedCat.gender ? `<p><span class="font-bold">⚧️ ${t('gender')}:</span> ${selectedCat.gender}</p>` : ''}
+                                        ${selectedCat.color ? `<p><span class="font-bold">🎨 ${t('color')}:</span> ${selectedCat.color}</p>` : ''}
+                                        <p><span class="font-bold">⏰ ${lang === 'id' ? 'Umur' : 'Age'}:</span> ${calculateAge(selectedCat.birthDate)}</p>
+                                        <p><span class="font-bold">🎂 ${lang === 'id' ? 'Lahir' : 'Born'}:</span> ${formatDate(selectedCat.birthDate)}</p>
+                                        ${selectedCat.weight ? `<p><span class="font-bold">⚖️ ${t('weight')}:</span> ${selectedCat.weight} kg</p>` : ''}
+                                        ${selectedCat.price ? `<p><span class="font-bold">💰 ${t('price')}:</span> Rp ${parseInt(selectedCat.price).toLocaleString('id-ID')}</p>` : ''}
+                                        ${selectedCat.notes ? `<p><span class="font-bold">📝 ${t('notes')}:</span> ${selectedCat.notes}</p>` : ''}
+                                    </div>
+                                    
+                                    <div class="flex gap-4 mt-8">
+                                        <button onclick="formData=${JSON.stringify(selectedCat).replace(/"/g, '&quot;')}; page='add'; render();" 
+                                            class="flex-1 bg-blue-500 text-white py-4 rounded-xl font-bold hover:bg-blue-600">
+                                            ✏️ ${t('edit')}
+                                        </button>
+                                        <button onclick="deleteCat(${selectedCat.id})" 
+                                            class="flex-1 bg-red-500 text-white py-4 rounded-xl font-bold hover:bg-red-600">
+                                            🗑️ ${t('delete')}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-white rounded-2xl shadow-xl p-8">
+                                <div class="flex justify-between items-center mb-6">
+                                    <h3 class="text-2xl font-bold flex items-center gap-3">📊 ${t('weightChart')}</h3>
+                                    <button onclick="formData={}; page='addWeight'; render();" 
+                                        class="bg-blue-500 text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-600">
+                                        + ${t('add')}
+                                    </button>
+                                </div>
+                                ${catWeights.length === 0 ? 
+                                    `<p class="text-gray-400 text-center py-8">${t('noData')}</p>` :
+                                    `
+                                    <div class="h-64 mb-4">
+                                        <canvas id="weightChart"></canvas>
+                                    </div>
+                                    <div class="space-y-2">
+                                        ${catWeights.slice(0, 5).map(w => `
+                                            <div class="flex justify-between items-center border-2 border-gray-200 rounded-xl p-3">
+                                                <div>
+                                                    <span class="font-bold">${w.weight} kg</span>
+                                                    <span class="text-gray-500 text-sm ml-2">${formatDate(w.date)}</span>
+                                                </div>
+                                                <button onclick="deleteWeightRecord(${w.id})" class="text-red-500 hover:text-red-700">🗑️</button>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                    `
+                                }
+                            </div>
+                            
+                            <div class="bg-white rounded-2xl shadow-xl p-8">
+                                <div class="flex justify-between items-center mb-6">
+                                    <h3 class="text-2xl font-bold flex items-center gap-3">💉 ${t('vaccines')}</h3>
+                                    <button onclick="formData={}; page='addVaccine'; render();" 
+                                        class="bg-green-500 text-white px-6 py-3 rounded-xl font-bold hover:bg-green-600">
+                                        + ${t('add')}
+                                    </button>
+                                </div>
+                                ${catVaccines.length === 0 ? 
+                                    `<p class="text-gray-400 text-center py-8">${t('noData')}</p>` :
+                                    `<div class="space-y-4">
+                                        ${catVaccines.map(v => `
+                                            <div class="border-2 border-gray-200 rounded-xl p-5 relative">
+                                                <button onclick="deleteVaccine(${v.id})" 
+                                                    class="absolute top-3 right-3 text-red-500 hover:text-red-700 text-xl font-bold">
+                                                    🗑️
+                                                </button>
+                                                <h4 class="font-bold text-xl">${v.name}</h4>
+                                                <p class="text-gray-600">📅 ${t('date')}: ${formatDate(v.date)}</p>
+                                                ${v.nextDate ? `<p class="text-gray-600">🔄 ${t('nextVaccine')}: ${formatDate(v.nextDate)}</p>` : ''}
+                                                ${v.notes ? `<p class="text-gray-500 mt-2">${v.notes}</p>` : ''}
+                                                ${v.reminder ? `<span class="inline-block mt-2 text-yellow-600 bg-yellow-100 px-3 py-1 rounded-full text-sm">🔔 ${t('activeReminder')}</span>` : ''}
+                                            </div>
+                                        `).join('')}
+                                    </div>`
+                                }
+                            </div>
+                            
+                            <div class="bg-white rounded-2xl shadow-xl p-8">
+                                <div class="flex justify-between items-center mb-6">
+                                    <h3 class="text-2xl font-bold flex items-center gap-3">💊 ${t('medicines')}</h3>
+                                    <button onclick="formData={}; page='addMedicine'; render();" 
+                                        class="bg-purple-500 text-white px-6 py-3 rounded-xl font-bold hover:bg-purple-600">
+                                        + ${t('add')}
+                                    </button>
+                                </div>
+                                ${catMedicines.length === 0 ? 
+                                    `<p class="text-gray-400 text-center py-8">${t('noData')}</p>` :
+                                    `<div class="space-y-4">
+                                        ${catMedicines.map(m => `
+                                            <div class="border-2 border-gray-200 rounded-xl p-5 relative">
+                                                <button onclick="deleteMedicine(${m.id})" 
+                                                    class="absolute top-3 right-3 text-red-500 hover:text-red-700 text-xl font-bold">
+                                                    🗑️
+                                                </button>
+                                                <h4 class="font-bold text-xl">${m.name}</h4>
+                                                <p class="text-gray-600">💊 ${t('type')}: ${m.type}</p>
+                                                <p class="text-gray-600">💉 ${t('dosage')}: ${m.dosage}</p>
+                                                <p class="text-gray-600">⏱️ ${t('duration')}: ${m.duration} ${t('days')}</p>
+                                                ${m.notes ? `<p class="text-gray-500 mt-2">${m.notes}</p>` : ''}
+                                                ${m.reminder ? `<span class="inline-block mt-2 text-yellow-600 bg-yellow-100 px-3 py-1 rounded-full text-sm">🔔 ${t('activeReminder')}</span>` : ''}
+                                            </div>
+                                        `).join('')}
+                                    </div>`
+                                }
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                if (catWeights.length > 0) {
+                    renderWeightChart();
+                }
+            }
+            
+            else if (page === 'addWeight') {
+                app.innerHTML = `
+                    <div class="min-h-screen bg-gradient-to-br ${bgGradient} fade-in">
+                        <div class="bg-gradient-to-r ${gradient} p-6 shadow-xl">
+                            <div class="flex items-center gap-4 max-w-2xl mx-auto">
+                                <button onclick="page='detail'; render();" class="text-white p-2 rounded-lg text-2xl">←</button>
+                                <h1 class="text-2xl font-bold text-white">${t('addWeight')}</h1>
+                            </div>
+                        </div>
+                        
+                        <div class="p-6 max-w-2xl mx-auto">
+                            <div class="bg-white rounded-2xl shadow-xl p-8 space-y-6">
+                                <div>
+                                    <label class="block font-bold mb-3">⚖️ ${t('weight')} (${t('kg')}) *</label>
+                                    <input type="number" step="0.1" id="wWeight" placeholder="3.5" 
+                                        class="w-full p-4 border-2 border-gray-300 rounded-xl">
+                                </div>
+                                <div>
+                                    <label class="block font-bold mb-3">📅 ${t('date')} *</label>
+                                    <input type="date" id="wDate" value="${new Date().toISOString().split('T')[0]}" 
+                                        class="w-full p-4 border-2 border-gray-300 rounded-xl">
+                                </div>
+                                <div class="flex gap-4">
+                                    <button onclick="
+                                        formData.weight = document.getElementById('wWeight').value;
+                                        formData.date = document.getElementById('wDate').value;
+                                        saveWeightRecord();
+                                    " class="flex-1 bg-gradient-to-r ${gradient} text-white py-4 rounded-xl font-bold">
+                                        💾 ${t('save')}
+                                    </button>
+                                    <button onclick="page='detail'; render();" 
+                                        class="flex-1 bg-gray-400 text-white py-4 rounded-xl font-bold">❌ ${t('cancel')}</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            else if (page === 'addVaccine') {
+                app.innerHTML = `
+                    <div class="min-h-screen bg-gradient-to-br from-green-100 to-teal-100 fade-in">
+                        <div class="bg-gradient-to-r from-green-500 to-teal-600 p-6 shadow-xl">
+                            <div class="flex items-center gap-4 max-w-2xl mx-auto">
+                                <button onclick="page='detail'; render();" class="text-white p-2 rounded-lg text-2xl">←</button>
+                                <h1 class="text-2xl font-bold text-white">${t('add')} ${t('vaccine')}</h1>
+                            </div>
+                        </div>
+                        
+                        <div class="p-6 max-w-2xl mx-auto">
+                            <div class="bg-white rounded-2xl shadow-xl p-8 space-y-6">
+                                <div>
+                                    <label class="block font-bold mb-3">💉 ${lang === 'id' ? 'Nama Vaksin' : 'Vaccine Name'} *</label>
+                                    <input type="text" id="vName" placeholder="Rabies, Feline Distemper" 
+                                        class="w-full p-4 border-2 border-gray-300 rounded-xl">
+                                </div>
+                                <div>
+                                    <label class="block font-bold mb-3">📅 ${t('date')} *</label>
+                                    <input type="date" id="vDate" class="w-full p-4 border-2 border-gray-300 rounded-xl">
+                                </div>
+                                <div>
+                                    <label class="block font-bold mb-3">🔄 ${t('nextVaccine')}</label>
+                                    <input type="date" id="vNext" class="w-full p-4 border-2 border-gray-300 rounded-xl">
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <input type="checkbox" id="vReminder" class="w-6 h-6">
+                                    <label for="vReminder" class="font-bold">🔔 ${t('reminder')}</label>
+                                </div>
+                                <div>
+                                    <label class="block font-bold mb-3">📝 ${t('notes')}</label>
+                                    <textarea id="vNotes" rows="4" class="w-full p-4 border-2 border-gray-300 rounded-xl"></textarea>
+                                </div>
+                                <div class="flex gap-4">
+                                    <button onclick="
+                                        formData.name = document.getElementById('vName').value;
+                                        formData.date = document.getElementById('vDate').value;
+                                        formData.nextDate = document.getElementById('vNext').value;
+                                        formData.reminder = document.getElementById('vReminder').checked;
+                                        formData.notes = document.getElementById('vNotes').value;
+                                        saveVaccine();
+                                    " class="flex-1 bg-gradient-to-r from-green-500 to-teal-600 text-white py-4 rounded-xl font-bold">
+                                        💾 ${t('save')}
+                                    </button>
+                                    <button onclick="page='detail'; render();" 
+                                        class="flex-1 bg-gray-400 text-white py-4 rounded-xl font-bold">❌ ${t('cancel')}</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            else if (page === 'addMedicine') {
+                app.innerHTML = `
+                    <div class="min-h-screen bg-gradient-to-br from-purple-100 to-indigo-100 fade-in">
+                        <div class="bg-gradient-to-r from-purple-500 to-indigo-600 p-6 shadow-xl">
+                            <div class="flex items-center gap-4 max-w-2xl mx-auto">
+                                <button onclick="page='detail'; render();" class="text-white p-2 rounded-lg text-2xl">←</button>
+                                <h1 class="text-2xl font-bold text-white">${t('add')} ${t('medicine')}</h1>
+                            </div>
+                        </div>
+                        
+                        <div class="p-6 max-w-2xl mx-auto">
+                            <div class="bg-white rounded-2xl shadow-xl p-8 space-y-6">
+                                <div>
+                                    <label class="block font-bold mb-3">💊 ${lang === 'id' ? 'Nama' : 'Name'} *</label>
+                                    <input type="text" id="mName" placeholder="Vitamin C, Antibiotik" 
+                                        class="w-full p-4 border-2 border-gray-300 rounded-xl">
+                                </div>
+                                <div>
+                                    <label class="block font-bold mb-3">🏷️ ${t('type')} *</label>
+                                    <select id="mType" class="w-full p-4 border-2 border-gray-300 rounded-xl">
+                                        <option value="">${t('choose')}</option>
+                                        <option value="${lang === 'id' ? 'Obat' : 'Medicine'}">${lang === 'id' ? 'Obat' : 'Medicine'}</option>
+                                        <option value="Vitamin">Vitamin</option>
+                                        <option value="${lang === 'id' ? 'Suplemen' : 'Supplement'}">${lang === 'id' ? 'Suplemen' : 'Supplement'}</option>
+                                        <option value="${lang === 'id' ? 'Antibiotik' : 'Antibiotic'}">${lang === 'id' ? 'Antibiotik' : 'Antibiotic'}</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block font-bold mb-3">💉 ${t('dosage')} *</label>
+                                    <input type="text" id="mDosage" placeholder="${lang === 'id' ? '2x sehari, 1 tablet' : '2x daily, 1 tablet'}" 
+                                        class="w-full p-4 border-2 border-gray-300 rounded-xl">
+                                </div>
+                                <div>
+                                    <label class="block font-bold mb-3">⏱️ ${t('duration')} (${t('days')}) *</label>
+                                    <input type="number" id="mDuration" placeholder="7" 
+                                        class="w-full p-4 border-2 border-gray-300 rounded-xl">
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <input type="checkbox" id="mReminder" class="w-6 h-6">
+                                    <label for="mReminder" class="font-bold">🔔 ${t('reminder')}</label>
+                                </div>
+                                <div>
+                                    <label class="block font-bold mb-3">📝 ${t('notes')}</label>
+                                    <textarea id="mNotes" rows="4" class="w-full p-4 border-2 border-gray-300 rounded-xl"></textarea>
+                                </div>
+                                <div class="flex gap-4">
+                                    <button onclick="
+                                        formData.name = document.getElementById('mName').value;
+                                        formData.type = document.getElementById('mType').value;
+                                        formData.dosage = document.getElementById('mDosage').value;
+                                        formData.duration = document.getElementById('mDuration').value;
+                                        formData.reminder = document.getElementById('mReminder').checked;
+                                        formData.notes = document.getElementById('mNotes').value;
+                                        saveMedicine();
+                                    " class="flex-1 bg-gradient-to-r from-purple-500 to-indigo-600 text-white py-4 rounded-xl font-bold">
+                                        💾 ${t('save')}
+                                    </button>
+                                    <button onclick="page='detail'; render();" 
+                                        class="flex-1 bg-gray-400 text-white py-4 rounded-xl font-bold">❌ ${t('cancel')}</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            else if (page === 'calendar') {
+                app.innerHTML = `
+                    <div class="min-h-screen bg-gradient-to-br ${bgGradient} fade-in">
+                        <div class="bg-gradient-to-r ${gradient} p-6 shadow-xl">
+                            <div class="flex items-center gap-4 max-w-4xl mx-auto">
+                                <button onclick="page='home'; render();" class="text-white p-2 rounded-lg text-2xl">←</button>
+                                <h1 class="text-2xl font-bold text-white">📅 ${t('calendar')}</h1>
+                            </div>
+                        </div>
+                        
+                        <div class="p-6 max-w-4xl mx-auto">
+                            <div class="bg-white rounded-2xl shadow-xl p-8">
+                                <h3 class="text-2xl font-bold mb-6 text-center">
+                                    ${new Date().toLocaleDateString(lang === 'id' ? 'id-ID' : 'en-US', { month: 'long', year: 'numeric' })}
+                                </h3>
+                                ${renderCalendar()}
+                                
+                                <div class="mt-8 space-y-4">
+                                    <h4 class="text-xl font-bold">${lang === 'id' ? 'Jadwal Vaksin Mendatang' : 'Upcoming Vaccines'}</h4>
+                                    ${vaccines.filter(v => v.nextDate && new Date(v.nextDate) >= new Date()).length === 0 ? 
+                                        `<p class="text-gray-400 text-center py-4">${t('noData')}</p>` :
+                                        `<div class="space-y-3">
+                                            ${vaccines
+                                                .filter(v => v.nextDate && new Date(v.nextDate) >= new Date())
+                                                .sort((a, b) => new Date(a.nextDate) - new Date(b.nextDate))
+                                                .slice(0, 5)
+                                                .map(v => {
+                                                    const cat = cats.find(c => c.id === v.catId);
+                                                    return `
+                                                        <div class="border-2 border-gray-200 rounded-xl p-4">
+                                                            <h5 class="font-bold">${v.name}</h5>
+                                                            <p class="text-gray-600">🐱 ${cat ? cat.name : 'Unknown'}</p>
+                                                            <p class="text-gray-600">📅 ${formatDate(v.nextDate)}</p>
+                                                        </div>
+                                                    `;
+                                                }).join('')}
+                                        </div>`
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            else if (page === 'settings') {
+                app.innerHTML = `
+                    <div class="min-h-screen bg-gradient-to-br from-gray-100 to-blue-100 fade-in">
+                        <div class="bg-gradient-to-r from-gray-700 to-blue-600 p-6 shadow-xl">
+                            <div class="flex items-center gap-4 max-w-2xl mx-auto">
+                                <button onclick="page='home'; render();" class="text-white p-2 rounded-lg text-2xl">←</button>
+                                <h1 class="text-2xl font-bold text-white">⚙️ ${t('settings')}</h1>
+                            </div>
+                        </div>
+                        
+                        <div class="p-6 max-w-2xl mx-auto space-y-6">
+                            <div class="bg-white rounded-2xl shadow-xl p-8">
+                                <h3 class="text-xl font-bold mb-4">🌐 ${t('language')}</h3>
+                                <div class="flex gap-3">
+                                    <button onclick="changeLang('id')" 
+                                        class="flex-1 py-3 rounded-xl font-bold ${lang === 'id' ? 'bg-blue-500 text-white' : 'bg-gray-200'}">
+                                        🇮🇩 Indonesia
+                                    </button>
+                                    <button onclick="changeLang('en')" 
+                                        class="flex-1 py-3 rounded-xl font-bold ${lang === 'en' ? 'bg-blue-500 text-white' : 'bg-gray-200'}">
+                                        🇬🇧 English
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-white rounded-2xl shadow-xl p-8">
+                                <h3 class="text-xl font-bold mb-4">🌙 ${t('darkMode')}</h3>
+                                <button onclick="toggleDarkMode()" 
+                                    class="w-full py-4 rounded-xl font-bold ${darkMode ? 'bg-gray-800 text-white' : 'bg-gray-200'}">
+                                    ${darkMode ? '☀️ ' + (lang === 'id' ? 'Mode Terang' : 'Light Mode') : '🌙 ' + (lang === 'id' ? 'Mode Gelap' : 'Dark Mode')}
+                                </button>
+                            </div>
+                            
+                            <div class="bg-white rounded-2xl shadow-xl p-8">
+                                <h3 class="text-xl font-bold mb-4">🎨 ${t('theme')}</h3>
+                                <div class="grid grid-cols-3 gap-3">
+                                    <button onclick="changeTheme('pink')" 
+                                        class="aspect-square rounded-xl ${currentTheme === 'pink' ? 'ring-4 ring-pink-500' : ''} bg-gradient-to-br from-pink-500 to-purple-600">
+                                    </button>
+                                    <button onclick="changeTheme('blue')" 
+                                        class="aspect-square rounded-xl ${currentTheme === 'blue' ? 'ring-4 ring-blue-500' : ''} bg-gradient-to-br from-blue-500 to-cyan-600">
+                                    </button>
+                                    <button onclick="changeTheme('green')" 
+                                        class="aspect-square rounded-xl ${currentTheme === 'green' ? 'ring-4 ring-green-500' : ''} bg-gradient-to-br from-green-500 to-teal-600">
+                                    </button>
+                                    <button onclick="changeTheme('orange')" 
+                                        class="aspect-square rounded-xl ${currentTheme === 'orange' ? 'ring-4 ring-orange-500' : ''} bg-gradient-to-br from-orange-500 to-amber-600">
+                                    </button>
+                                    <button onclick="changeTheme('purple')" 
+                                        class="aspect-square rounded-xl ${currentTheme === 'purple' ? 'ring-4 ring-purple-500' : ''} bg-gradient-to-br from-purple-500 to-fuchsia-600">
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-white rounded-2xl shadow-xl p-8">
+                                <h3 class="text-xl font-bold mb-4">🔔 ${t('notifications')}</h3>
+                                <button onclick="requestNotificationPermission()" 
+                                    class="w-full py-4 rounded-xl font-bold bg-yellow-500 text-white hover:bg-yellow-600">
+                                    ${t('enable')} ${t('notifications')}
+                                </button>
+                                <p class="text-sm text-gray-500 mt-2">
+                                    ${lang === 'id' ? 'Status: ' : 'Status: '}
+                                    ${typeof Notification !== 'undefined' ? Notification.permission : 'not supported'}
+                                </p>
+                            </div>
+                            
+                            <div class="bg-white rounded-2xl shadow-xl p-8">
+                                <h3 class="text-xl font-bold mb-4">📊 ${t('statistics')}</h3>
+                                <div class="space-y-2">
+                                    <p class="text-lg">🐱 ${t('total')} ${lang === 'id' ? 'Kucing' : 'Cats'}: <span class="font-bold">${cats.length}</span></p>
+                                    <p class="text-lg">💉 ${t('total')} ${t('vaccines')}: <span class="font-bold">${vaccines.length}</span></p>
+                                    <p class="text-lg">💊 ${t('total')} ${t('medicines')}: <span class="font-bold">${medicines.length}</span></p>
+                                    <p class="text-lg">📊 ${t('total')} ${lang === 'id' ? 'Catatan Berat' : 'Weight Records'}: <span class="font-bold">${weightRecords.length}</span></p>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-white rounded-2xl shadow-xl p-8">
+                                <h3 class="text-xl font-bold mb-4">💾 ${t('backup')}</h3>
+                                <div class="space-y-4">
+                                    <button onclick="exportData()" 
+                                        class="w-full bg-green-500 text-white py-4 rounded-xl font-bold hover:bg-green-600">
+                                        📥 ${t('download')}
+                                    </button>
+                                    
+                                    <div class="file-input-wrapper">
+                                        <input type="file" id="importFile" accept=".json" onchange="importData(event)">
+                                        <label for="importFile" class="file-input-label">
+                                            <div class="text-3xl mb-2">📤</div>
+                                            <div class="font-bold text-lg text-gray-700">${t('restore')}</div>
+                                            <div class="text-sm text-gray-500 mt-1">${t('upload')}</div>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-white rounded-2xl shadow-xl p-8">
+                                <h3 class="text-xl font-bold mb-4 text-red-600">⚠️ ${t('dangerZone')}</h3>
+                                <button onclick="
+                                    if (confirm('${lang === 'id' ? 'HAPUS SEMUA DATA? Tindakan ini tidak bisa dibatalkan!' : 'DELETE ALL DATA? This action cannot be undone!'}')) {
+                                        if (confirm('${lang === 'id' ? 'Yakin sekali? Data akan hilang permanen!' : 'Are you sure? Data will be permanently lost!'}')) {
+                                            cats = [];
+                                            vaccines = [];
+                                            medicines = [];
+                                            weightRecords = [];
+                                            saveData();
+                                            page = 'home';
+                                            render();
+                                            alert('${lang === 'id' ? 'Semua data berhasil dihapus' : 'All data deleted successfully'}');
+                                        }
+                                    }
+                                " class="w-full bg-red-500 text-white py-4 rounded-xl font-bold hover:bg-red-600">
+                                    🗑️ ${t('deleteAll')}
+                                </button>
+                            </div>
+                            
+                            <div class="bg-white rounded-2xl shadow-xl p-8">
+                                <h3 class="text-xl font-bold mb-4">ℹ️ ${t('about')}</h3>
+                                <div class="space-y-2 text-gray-600">
+                                    <p>📱 ${lang === 'id' ? 'Cat Story Lovers Ultimate' : 'Cat Story Lovers Ultimate'}</p>
+                                    <p>🔢 ${t('version')} 3.0</p>
+                                    <p>👨‍💻 ${lang === 'id' ? 'Dibuat dengan' : 'Made with'} ❤️</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        // Load data and render on startup
+        loadData();
+        render();
+    </script>
+</body>
+</html>
